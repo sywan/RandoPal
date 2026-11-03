@@ -1,6 +1,6 @@
 # RandoPal · Chrome Web Store 上架文案與素材（V0.55）
 
-在開發人員後台上傳 `RandoPal-chrome-v0.55.zip` 後，依下列欄位填寫。「中文（繁體）」與 English 可在商店資訊頁上方的語言選單分別編輯；ZIP 已包含 `_locales/zh_TW` 與 `_locales/en`。App 內可用「繁中 / EN」切換語言。商店截圖由 V0.50 素材沿用，正式送審前請重新擷取 V0.55 畫面。
+在開發人員後台上傳 `RandoPal-chrome-v0.55.zip` 後，依下列欄位填寫。「中文（繁體）」與 English 可在商店資訊頁上方的語言選單分別編輯；ZIP 已包含 `_locales/zh_TW` 與 `_locales/en`。App 內可用「繁中 / EN」切換語言。下列三張商店截圖已於 V0.55 使用乾淨的示範名單重新擷取，尺寸皆為 1280 × 800。
 
 ## 商店欄位
 
@@ -17,6 +17,8 @@
 | 大型宣傳圖（選填） | `store-assets/promo-marquee-1400x560.png` |
 
 宣傳圖無法依語言分別上傳，因此採用中性的英文品牌字樣；截圖則可以依語言上傳。商店截圖使用示範名單，不含使用者的私人資料。
+
+日後更新畫面時，可在專案根目錄執行 `node scripts/capture-store-screenshots.mjs`，用本機 Chrome 從示範名單重新產生這三張截圖。
 
 ## 簡短說明／Summary
 
