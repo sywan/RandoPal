@@ -1,7 +1,7 @@
 import {randomInt,shuffle,parseNames,makeGroups,parseCsv,parseDelimited,makeRecordSet,serializeTsv,formatRecord} from './core.js';
 import {loadState,saveState} from './storage.js';
 import {namesFromXlsx} from './xlsx.js';
-import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=2';
+import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=3';
 
 const $=id=>document.getElementById(id);
 const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',orderRevealIndex:0,groupRevealIndex:0,groupMethod:'count',order:[],groups:[],running:false,editingNew:false,editorSelection:new Set([0]),editorSingleColumnName:'姓名',importTable:null,lastWinner:null};
@@ -9,7 +9,7 @@ let toastTimer;
 let palTimer;
 let audioContext;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const idlePal=reducedMotion?'icons/guga-pal-hd.png':'icons/guga-pal-hd.webp';
+const idlePal=reducedMotion?'icons/guga-pal-hd.png':'icons/guga-pal-hd.webp?v=055';
 function tone(frequency,duration=.07,delay=0,volume=.035){
   if(!state.data?.soundEnabled)return;
   try{

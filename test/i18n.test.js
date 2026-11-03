@@ -10,7 +10,7 @@ test('Chinese and English translation catalogs match',()=>{
 
 test('static Chinese interface text has an English translation',()=>{
   const html=readFileSync(new URL('../index.html',import.meta.url),'utf8');
-  const allowed=new Set(['中文','語言 / Language']);
+  const allowed=new Set(['繁中','語言 / Language']);
   const labels=[...html.matchAll(/>([^<>]+)</g)].map(match=>match[1].trim());
   const attributes=[...html.matchAll(/(?:aria-label|title|placeholder|alt)="([^"]+)"/g)].map(match=>match[1].replaceAll('&#10;','\n'));
   const missing=[...labels,...attributes].filter(value=>/[\u3400-\u9fff]/u.test(value)&&!allowed.has(value)&&!Object.hasOwn(staticEnglish,value));

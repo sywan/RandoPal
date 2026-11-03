@@ -52,7 +52,7 @@ export const staticEnglish={
   '刪除此名單':'Delete Roster','取消':'Cancel','儲存名單':'Save Roster',
   '側邊欄':'Sidebar','新增名單':'Add roster','調整側邊欄寬度':'Resize sidebar','收合側邊欄':'Collapse sidebar','在新分頁開啟':'Open in a new tab',
   '開啟音效':'Turn on sound','隨機玩法':'Random activities','翻開第一張牌':'Flip the first card','翻開第二張牌':'Flip the second card','翻開第三張牌':'Flip the third card',
-  '咕嘎企鵝夥伴':'Guga the penguin pal','關閉':'Close','RandoPal 版本 V0.50':'RandoPal version V0.50',
+  '咕嘎企鵝夥伴':'Guga the penguin pal','關閉':'Close','繁體中文':'Traditional Chinese','RandoPal 版本 V0.55':'RandoPal version V0.55',
   '例如：\n王小明\n陳小華\n林小美':'For example:\nAlex\nSam\nTaylor'
 };
 const staticTranslations={'zh-Hant':{},en:staticEnglish};
