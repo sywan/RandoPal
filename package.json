@@ -1,0 +1,14 @@
+{
+  "name": "randopal",
+  "version": "0.50.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "python3 -m http.server 4173",
+    "test": "node --test",
+    "package": "node scripts/package-platforms.mjs",
+    "package:safari": "node scripts/package-safari.mjs",
+    "package:all": "npm run package && npm run package:safari",
+    "build:guide": "npm --prefix guide run build"
+  }
+}

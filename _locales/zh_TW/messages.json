@@ -1,0 +1,8 @@
+{
+  "appName": {
+    "message": "RandoPal - 隨機抽選、排序與分組"
+  },
+  "appDescription": {
+    "message": "匯入 CSV／Excel 名單，用轉盤、跑馬燈或翻牌隨機抽人，也能排出場順序與平均分組。"
+  }
+}

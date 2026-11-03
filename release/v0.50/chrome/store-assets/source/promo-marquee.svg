@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="560" viewBox="0 0 1400 560">
+ <rect width="1400" height="560" fill="#e8f6ff"/>
+ <circle cx="1378" cy="570" r="448.0" fill="#d5edff"/>
+ <circle cx="252.0" cy="-84.0" r="280.0" fill="#f4fbff"/>
+ <path d="M616.0 459.2 Q952.0000000000001 168.0 1344.0 336.0" fill="none" stroke="#b5defb" stroke-width="22" stroke-linecap="round"/>
+ <g transform="translate(125 143) scale(2.15)">
+  <rect x="16" y="16" width="96" height="96" rx="27" fill="#328fe0"/>
+  <path d="M29 39a27 27 0 0 1 22-10" fill="none" stroke="#8ed4ff" stroke-width="5" stroke-linecap="round"/>
+  <path d="M86 99a31 31 0 0 0 15-17" fill="none" stroke="#1767bb" stroke-width="5" stroke-linecap="round"/>
+  <circle cx="64" cy="65" r="32" fill="#f9fdff"/>
+  <path d="M64 36v29l23-17A31 31 0 0 0 64 34z" fill="#c9ebff"/>
+  <path d="M87 48 64 65l28 12A31 31 0 0 0 87 48z" fill="#78c8f8"/>
+  <path d="m92 77-28-12 2 31a31 31 0 0 0 26-19z" fill="#dff3ff"/>
+  <path d="m66 96-2-31-25 18a31 31 0 0 0 27 13z" fill="#8bd2fa"/>
+  <path d="m39 83 25-18-28-13a31 31 0 0 0 3 31z" fill="#e7f7ff"/>
+  <path d="m36 52 28 13V34a31 31 0 0 0-28 18z" fill="#a7dfff"/>
+  <circle cx="64" cy="65" r="7" fill="#1767bb" stroke="#fff" stroke-width="3"/>
+  <path d="m64 24 10 15H54z" fill="#ffcf52" stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+  <path d="m98 29 2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#fff4b8"/>
+</g>
+ <text x="485" y="252" fill="#163c72" font-family="Arial,sans-serif" font-size="112" font-weight="700">RandoPal</text>
+ <text x="485" y="335" fill="#3a82c7" font-family="Arial,sans-serif" font-size="46" font-weight="700">PICK  ·  ORDER  ·  GROUP</text>
+ <path d="m1340 123.2 5 12 12 5-12 5-5 12-5-12-12-5 12-5z" fill="#ffca55"/>
+ </svg>

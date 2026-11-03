@@ -1,0 +1,20 @@
+import {readFile,writeFile,rm} from 'node:fs/promises';
+import {execFile} from 'node:child_process';
+import {promisify} from 'node:util';
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
+
+const run=promisify(execFile);
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const version='v0.50',appVersion='0.50.0',buildNumber='50';
+const out=path.join(root,'release',version,'safari');
+const source=path.join(root,'release',version,'chrome','extension');
+await run('xcrun',['safari-web-extension-converter',source,'--project-location',out,'--app-name','RandoPal','--bundle-identifier','com.randopal.safari','--swift','--copy-resources','--no-open','--no-prompt','--force']);
+const project=path.join(out,'RandoPal','RandoPal.xcodeproj','project.xcproj');
+let contents=await readFile(project,'utf8');
+contents=contents.replaceAll('"CURRENT_PROJECT_VERSION": "1"',`"CURRENT_PROJECT_VERSION": "${buildNumber}"`).replaceAll('"MARKETING_VERSION": "1.0"',`"MARKETING_VERSION": "${appVersion}"`);
+await writeFile(project,contents);
+const zip=path.join(out,`RandoPal-Safari-Source-${version}.zip`);
+await rm(zip,{force:true});
+await run('zip',['-q','-X','-r',zip,'RandoPal','README.md','01-wheel-1280x800.png'],{cwd:out});
+console.log(`Built Safari source package: ${zip}`);

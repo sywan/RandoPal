@@ -1,0 +1,8 @@
+{
+  "appName": {
+    "message": "RandoPal - Random Pick, Order & Groups"
+  },
+  "appDescription": {
+    "message": "Import CSV or Excel rosters, pick names with a wheel or cards, shuffle presentation order, and make balanced groups."
+  }
+}

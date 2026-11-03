@@ -1,0 +1,17 @@
+.DS_Store
+node_modules/
+*.log
+
+# Generated platform packages and duplicated web assets.
+release/**/*.zip
+release/v*/chrome/extension/
+release/v*/edge/extension/
+release/v*/ios/webapp/
+release/v*/ios/native/
+release/v*/safari/RandoPal/
+
+# The privacy policy is deployed from its own Sites repository.
+hosting/
+
+# Local planning documents are not needed for the public app repository.
+Initial Specs/
