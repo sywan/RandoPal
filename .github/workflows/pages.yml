@@ -1,0 +1,40 @@
+name: Publish web app
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/configure-pages@v5
+      - name: Stage only public web files
+        run: |
+          mkdir -p site/icons
+          cp index.html styles.css deployment-guide.html site/
+          cp -R src site/
+          cp icons/pal.svg icons/guga-pal-hd.png site/icons/
+          cp icons/guga-pal-web-v056.gif icons/guga-pal-web-v056.webp site/icons/
+          test -f site/index.html
+          du -sh site
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

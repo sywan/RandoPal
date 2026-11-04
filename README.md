@@ -6,7 +6,7 @@ RandoPal 提供名單隨機抽選、排序與平均分組。抽選有跑馬燈�
 
 ## 兩種使用方式
 
-- [公開網頁版](https://sywan.github.io/RandoPal/)：在電腦或手機的現代瀏覽器開啟。GitHub Pages 從 `main` 分支根目錄發布。
+- [公開網頁版](https://sywan.github.io/RandoPal/)：在電腦或手機的現代瀏覽器開啟。GitHub Pages 使用 `.github/workflows/pages.yml`，從 `main` 分支挑選網頁所需檔案發布。
 - [Chrome 擴充功能](release/v0.55/chrome/README.md)：從工具列開啟，也可用投影模式。V0.55 ZIP 已封存，本次網頁版更新不重新打包。
 
 兩者各自把名單與偏好保存在使用者目前的瀏覽器，不會自動跨裝置同步。CSV／XLSX 可用於轉移名單。隱私政策：[繁中 / English](https://randopal-privacy-policy.cguaacsb.chatgpt.site/)。
