@@ -6,10 +6,9 @@ import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} f
 const $=id=>document.getElementById(id);
 const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',orderRevealIndex:0,groupRevealIndex:0,groupMethod:'count',order:[],groups:[],running:false,editingNew:false,editorSelection:new Set([0]),editorSingleColumnName:'姓名',importTable:null,lastWinner:null};
 let toastTimer;
-let palTimer;
 let audioContext;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
-const idlePal=reducedMotion?'icons/guga-pal-hd.png':'icons/guga-pal-web-v056.webp';
+const idlePal=reducedMotion?'icons/guga-pal-hd.png':'icons/guga-pal-web-v056.webp?v=2';
 function tone(frequency,duration=.07,delay=0,volume=.035){
   if(!state.data?.soundEnabled)return;
   try{
@@ -32,11 +31,10 @@ const defaultDisplay=columns=>{const index=columns.findIndex(name=>/^(姓名|名
 function notify(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),2600)}
 function persist(){saveState(state.data).catch(()=>notify(t('storageError')))}
 function setText(id,text){$(id).textContent=text}
-function palSays(message,celebratory=false){
-  setText('palMessage',message);clearTimeout(palTimer);
-  $('palArt').src=celebratory&&!reducedMotion?'icons/guga-spin-hd.webp':idlePal;
+function palSays(message){
+  setText('palMessage',message);
+  $('palArt').src=idlePal;
   $('palArt').classList.remove('pal-pop');void $('palArt').offsetWidth;$('palArt').classList.add('pal-pop');
-  if(celebratory&&!reducedMotion)palTimer=setTimeout(()=>$('palArt').src=idlePal,2550);
 }
 function renderRosterStudio(){
   $('studioRosterList').replaceChildren(...state.data.rosters.map(r=>{
@@ -198,19 +196,19 @@ function pick(cardIndex=null){
     setTimeout(()=>{chosen.querySelector('.card-front').textContent=winner;chosen.classList.add('selected');finishPick(r,winner,winnerIndex,exclude)},Math.min(duration,750));
   }
 }
-function finishPick(r,winner,index,exclude){if(exclude)r.picked.push(index);state.running=false;state.lastWinner=winner;setText('slotName',winner);setText('stageSub',t('pickedSub',{name:winner}));setText('pickNote',t('pickedNote',{name:winner}));setText('pickBtn',t('pickAgain'));persist();renderStats();palSays(t('pickedPal',{name:winner}),true);successSound();celebrate()}
+function finishPick(r,winner,index,exclude){if(exclude)r.picked.push(index);state.running=false;state.lastWinner=winner;setText('slotName',winner);setText('stageSub',t('pickedSub',{name:winner}));setText('pickNote',t('pickedNote',{name:winner}));setText('pickBtn',t('pickAgain'));persist();renderStats();palSays(t('pickedPal',{name:winner}));successSound();celebrate()}
 function renderOrderResult(){
   const r=roster();const items=state.order.map((row,i)=>{const div=document.createElement('div');div.className='result-item';const b=document.createElement('b');b.textContent=String(i+1).padStart(2,'0');const span=document.createElement('span');span.textContent=label(row,r);div.append(b,span);return div});
   $('orderResult').className='result-list';$('orderResult').classList.toggle('hidden',state.orderDisplay!=='list');$('orderResult').replaceChildren(...items);$('copyOrder').disabled=false;$('exportOrder').disabled=false;renderOrderReveal();renderContext();
 }
-function generateOrder(){const r=roster();state.order=shuffle(r.rows);state.orderRevealIndex=0;shuffleSound();renderOrderResult();palSays(t('orderDonePal'),true)}
+function generateOrder(){const r=roster();state.order=shuffle(r.rows);state.orderRevealIndex=0;shuffleSound();renderOrderResult();palSays(t('orderDonePal'))}
 function updateGroupMethod(method){state.groupMethod=method;document.querySelectorAll('[data-group-method]').forEach(b=>b.classList.toggle('active',b.dataset.groupMethod===method));setText('groupNumberLabel',t(method==='count'?'groupCountLabel':'groupSizeLabel'));updateGroupHint()}
 function updateGroupHint(){setText('groupHint',t(state.groupMethod==='count'?'groupCountHint':'groupSizeHint',{count:$('groupNumber').value}));renderContext()}
 function renderGroupResult(){
   const r=roster();const cards=state.groups.map((group,i)=>{const div=document.createElement('div');div.className='group-card';const b=document.createElement('b');b.textContent=t('groupCard',{index:i+1,count:group.length});div.append(b,...group.map(row=>{const span=document.createElement('span');span.textContent=label(row,r);return span}));return div});
   $('groupResult').className='group-result';$('groupResult').classList.toggle('hidden',state.groupDisplay!=='grid');$('groupResult').replaceChildren(...cards);$('copyGroup').disabled=false;$('exportGroup').disabled=false;renderGroupReveal();renderContext();
 }
-function generateGroups(){const r=roster();state.groups=makeGroups(r.rows,state.groupMethod,$('groupNumber').value);state.groupRevealIndex=0;shuffleSound();renderGroupResult();palSays(t('groupDonePal',{count:state.groups.length}),true)}
+function generateGroups(){const r=roster();state.groups=makeGroups(r.rows,state.groupMethod,$('groupNumber').value);state.groupRevealIndex=0;shuffleSound();renderGroupResult();palSays(t('groupDonePal',{count:state.groups.length}))}
 function downloadCsv(filename,columns,rows){
   const safe=value=>{let text=String(value??'');if(/^[=+@-]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"'};
   const csv='\uFEFF'+[columns,...rows].map(row=>row.map(safe).join(',')).join('\r\n');
