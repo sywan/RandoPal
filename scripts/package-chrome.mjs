@@ -1,4 +1,4 @@
-import {copyFile,mkdir,rm} from 'node:fs/promises';
+import {copyFile,mkdir,readFile,rm} from 'node:fs/promises';
 import {execFile} from 'node:child_process';
 import {promisify} from 'node:util';
 import path from 'node:path';
@@ -6,7 +6,12 @@ import {fileURLToPath} from 'node:url';
 
 const run=promisify(execFile);
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const version='v0.55';
+const webVersion=JSON.parse(await readFile(path.join(root,'package.json'),'utf8')).version;
+const chromeVersion=JSON.parse(await readFile(path.join(root,'manifest.json'),'utf8')).version;
+if(webVersion!==chromeVersion){
+  throw new Error(`Web app V${webVersion} and Chrome extension V${chromeVersion} differ. The Chrome release is frozen; update manifest and packaging deliberately for a future extension release.`);
+}
+const version=`v${chromeVersion.split('.').slice(0,2).join('.')}`;
 const output=path.join(root,'release',version,'chrome');
 const extension=path.join(output,'extension');
 const files=[

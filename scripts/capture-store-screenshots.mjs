@@ -1,14 +1,18 @@
 import {createServer} from 'node:http';
-import {spawn} from 'node:child_process';
+import {spawn,spawnSync} from 'node:child_process';
 import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 
 const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-const {version}=JSON.parse(await readFile(path.join(root,'package.json'),'utf8'));
+const {version}=JSON.parse(await readFile(path.join(root,'manifest.json'),'utf8'));
 const releaseVersion=`v${version.split('.').slice(0,2).join('.')}`;
 const output=path.join(root,'release',releaseVersion,'chrome/store-assets');
+const packageZip=path.join(root,'release',releaseVersion,'chrome',`RandoPal-chrome-${releaseVersion}.zip`);
+const sourceRoot=await mkdtemp(path.join(tmpdir(),'randopal-store-package-'));
+const extracted=spawnSync('unzip',['-q',packageZip,'-d',sourceRoot],{stdio:'inherit'});
+if(extracted.status!==0)throw new Error(`Could not unpack Chrome release: ${packageZip}`);
 const chromePath=process.env.CHROME_PATH||'/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.json':'application/json','.png':'image/png','.webp':'image/webp','.gif':'image/gif','.svg':'image/svg+xml'};
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
@@ -45,8 +49,8 @@ class DevTools {
 }
 
 const server=createServer(async(req,res)=>{
-  const target=path.resolve(root,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));
-  if(!target.startsWith(root+path.sep)){res.writeHead(403).end();return}
+  const target=path.resolve(sourceRoot,'.'+decodeURIComponent(new URL(req.url,'http://localhost').pathname));
+  if(!target.startsWith(sourceRoot+path.sep)){res.writeHead(403).end();return}
   try{
     const contents=await readFile(target);
     res.writeHead(200,{'Content-Type':mime[path.extname(target)]||'application/octet-stream'}).end(contents);
@@ -115,4 +119,5 @@ try{
   chrome.kill();
   server.close();
   await rm(profile,{recursive:true,force:true,maxRetries:5,retryDelay:200});
+  await rm(sourceRoot,{recursive:true,force:true,maxRetries:5,retryDelay:200});
 }
