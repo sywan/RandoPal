@@ -52,6 +52,20 @@ export function makeReviewCircuit(teams,requestedRounds){
   const ordered=shuffle(teams),rounds=Math.min(teams.length-1,Math.max(1,Math.floor(Number(requestedRounds)||1)));
   return Array.from({length:rounds},(_,round)=>ordered.map((reviewer,i)=>({reviewer,subject:ordered[(i+round+1)%ordered.length]})));
 }
+export function drawIdeaPair(left,right,used=[],sameDeck=false){
+  const choices=[];
+  for(let a=0;a<left.length;a++)for(let b=0;b<right.length;b++){
+    if(sameDeck&&a===b)continue;
+    if(!used.some(pair=>pair[0]===a&&pair[1]===b))choices.push([a,b]);
+  }
+  return choices.length?choices[randomInt(choices.length)]:null;
+}
+export function makeBingoCard(rows,size){
+  const count=Math.floor(Number(size));
+  const unique=[...new Map(rows.map(row=>[JSON.stringify(row),row])).values()];
+  if(![3,4,5].includes(count)||unique.length<count*count)return [];
+  return shuffle(unique).slice(0,count*count);
+}
 export function parseDelimited(text,delimiter=','){
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++){

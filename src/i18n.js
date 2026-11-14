@@ -172,6 +172,36 @@ Object.assign(dynamicChinese,{
   newTaskRoster:'新任務卡庫',newRoleRoster:'新角色卡庫',taskRowsLabel:'任務卡',roleRowsLabel:'角色卡',taskRowsHelp:'單欄每行一項；多欄請貼上含標題列的表格',roleRowsHelp:'每行一個角色；多欄請貼上含標題列的表格',taskRowsPlaceholder:'例如：\n畫出你的想法\n提出三個問題',roleRowsPlaceholder:'例如：\n主持人\n記錄員\n計時員',taskEditorCount:'{rows} 張卡 · {columns} 欄',roleEditorCount:'{rows} 個角色 · {columns} 欄',
   challengePal:'來開一張任務卡吧！',rolesPal:'讓大家換個角色！',circuitPal:'安排多輪的互評！'
 });
+Object.assign(staticEnglish,{
+  'RandoPal 版本 V0.59':'RandoPal version V0.59','10 種玩法':'10 activities',
+  '創意混搭':'Idea Mixer','驚喜事件卡':'Twist Cards','話題賓果':'Conversation Bingo',
+  '把兩副卡庫隨機組合，產生意想不到的題目或創作方式。':'Combine two decks to make unexpected prompts and creative formats.',
+  '主題卡庫':'Topic deck','形式卡庫':'Format deck','管理卡庫':'Manage decks','主題':'Topic','形式':'Format','每一種組合在本輪只出現一次。':'Each combination appears once per round.','產生創意組合':'Create idea mix','重設組合':'Reset combinations',
+  '活動進行到一半時，抽一張突發事件卡，讓大家換個角度應變。':'Draw an unexpected event during an activity and adapt your approach.',
+  '事件卡庫':'Event deck','準備迎接驚喜':'Ready for a twist','抽出一個新條件，繼續挑戰！':'Draw a new constraint and keep going!','本輪不會重複抽到同一張事件卡。':'Event cards do not repeat in a round.','抽一張事件卡':'Draw an event card',
+  '從話題卡庫產生一張賓果卡，完成話題後點選格子；同一張卡不會出現重複題目。':'Build a bingo card from conversation prompts. Mark completed squares; prompts do not repeat on a card.',
+  '話題卡庫':'Conversation deck','賓果尺寸':'Bingo size','至少需要 9 張話題卡。':'At least 9 conversation cards are needed.','話題賓果':'Conversation Bingo','選好尺寸後產生賓果卡':'Choose a size and generate a bingo card','產生賓果卡':'Generate bingo card','清除標記':'Clear marks','列印':'Print',
+  '主題加形式，碰撞一個新點子。':'Pair a topic and format to spark a new idea.','開啟創意混搭 →':'Open Idea Mixer →',
+  '活動中途加入一個意外條件。':'Add a surprise constraint during an activity.','開啟驚喜事件卡 →':'Open Twist Cards →',
+  '用話題卡促成交流，完成一條線。':'Start conversations and complete a line.','開啟話題賓果 →':'Open Conversation Bingo →',
+  '產生創意組合 →':'Create idea mix →','抽一張事件卡 →':'Draw an event card →','重設本輪':'Reset round','產生賓果卡 →':'Generate bingo card →'
+});
+Object.assign(dynamicEnglish,{
+  creativeCategory:'Card creativity',mixerActivity:'Idea Mixer',twistActivity:'Twist Cards',bingoActivity:'Conversation Bingo',mixerActivityHint:'Combine two decks',twistActivityHint:'Reveal a surprise constraint',bingoActivityHint:'Complete a conversation line',
+  mixerTitle:'Mix a new idea',twistTitleMain:'Add a surprise twist',bingoTitle:'Get the conversation going',
+  demoTopics:'Sample Topic Deck',demoFormats:'Sample Format Deck',demoTwists:'Sample Twist Deck',demoBingo:'Sample Bingo Deck',topicColumn:'Topic',formatColumn:'Format',eventColumn:'Event',promptColumn:'Prompt',
+  mixerRemaining:'Combinations left',mixerUsed:'{count} combinations created',mixerHint:'{left} of {total} combinations left this round.',mixerEmpty:'All combinations have appeared. Reset to play again.',mixerPal:'Guga found a new idea mix!',mixerFile:'idea-mixes',
+  twistRemaining:'Event cards left',twistUsed:'{count} events drawn',twistHint:'{left} event cards left this round.',twistEmpty:'All event cards have been drawn. Reset the round.',twistReady:'Ready for a twist',twistReadyHint:'Draw a new constraint and keep going!',twistPal:'Guga has a surprise twist!',twistFile:'twist-cards',
+  bingoMarked:'Squares marked',bingoCardCount:'{count} prompts on this card',bingoNeed:'Need {count} cards; this deck has {available}.',bingoReady:'Choose a size and generate a bingo card',bingoProgress:'{marked} / {total} marked · {lines} complete lines',bingoPal:'Guga prepared a conversation bingo card!',bingoFile:'conversation-bingo',bingoRowColumn:'Row',bingoColColumn:'Column',bingoMarkedColumn:'Marked',yes:'Yes',no:'No'
+});
+Object.assign(dynamicChinese,{
+  creativeCategory:'卡片創意',mixerActivity:'創意混搭',twistActivity:'驚喜事件卡',bingoActivity:'話題賓果',mixerActivityHint:'組合兩副卡庫',twistActivityHint:'抽出意外條件',bingoActivityHint:'聊出一條賓果線',
+  mixerTitle:'碰撞出一個新點子',twistTitleMain:'加入一個驚喜轉折',bingoTitle:'讓話題自然展開',
+  demoTopics:'創意主題卡',demoFormats:'創意形式卡',demoTwists:'驚喜事件卡',demoBingo:'話題賓果卡',topicColumn:'主題',formatColumn:'形式',eventColumn:'事件',promptColumn:'話題',
+  mixerRemaining:'剩餘組合',mixerUsed:'已產生 {count} 組',mixerHint:'本輪還有 {left} / {total} 種組合。',mixerEmpty:'所有組合都出現過了，請重設後再玩。',mixerPal:'咕嘎幫你碰撞出新點子！',mixerFile:'創意混搭',
+  twistRemaining:'剩餘事件卡',twistUsed:'已抽出 {count} 張事件卡',twistHint:'本輪還剩 {left} 張事件卡。',twistEmpty:'事件卡已抽完，請重設本輪。',twistReady:'準備迎接驚喜',twistReadyHint:'抽出一個新條件，繼續挑戰！',twistPal:'咕嘎帶來一張驚喜事件卡！',twistFile:'驚喜事件卡',
+  bingoMarked:'已標記格數',bingoCardCount:'這張卡有 {count} 個話題',bingoNeed:'需要 {count} 張話題卡；目前卡庫有 {available} 張。',bingoReady:'選好尺寸後產生賓果卡',bingoProgress:'已標記 {marked} / {total} 格 · 完成 {lines} 條線',bingoPal:'咕嘎準備好話題賓果卡！',bingoFile:'話題賓果',bingoRowColumn:'列',bingoColColumn:'欄',bingoMarkedColumn:'已標記',yes:'是',no:'否'
+});
 export function translationCatalogComplete(){
   const source=Object.keys(dynamicChinese).sort();
   return LANGUAGES.every(({code})=>{

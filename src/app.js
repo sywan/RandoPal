@@ -1,12 +1,12 @@
-import {randomInt,shuffle,parseNames,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,parseCsv,parseDelimited,makeRecordSet,serializeTsv,formatRecord} from './core.js';
+import {randomInt,shuffle,parseNames,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,parseCsv,parseDelimited,makeRecordSet,serializeTsv,formatRecord} from './core.js';
 import {initialState,loadState,saveState} from './storage.js';
 import {namesFromXlsx} from './xlsx.js';
-import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=8';
+import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=9';
 
 const $=id=>document.getElementById(id);
-const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',pairDisplay:'grid',reviewDisplay:'grid',roleTargetKind:'person',orderRevealIndex:0,groupRevealIndex:0,pairRevealIndex:0,reviewRevealIndex:0,groupMethod:'count',pairMethod:'size',order:[],groups:[],pairings:[],taskDraws:[],rolesAssigned:[],previousRoles:[],reviewRounds:[],running:false,editingNew:false,editorSelection:new Set([0]),editorColumnsSignature:'',editorSingleColumnName:'姓名',importTable:null,lastWinner:null};
-const categories=[{id:'quick',key:'quickCategory',modes:['pick','task']},{id:'plan',key:'planCategory',modes:['order','group','role']},{id:'exchange',key:'exchangeCategory',modes:['pair','review']}];
-const activityMeta={pick:['✧','pickActivity','pickActivityHint','LUCKY PICK','pickTitle'],task:['▣','taskActivity','taskActivityHint','CHALLENGE DRAW','taskTitle'],order:['☷','orderActivity','orderActivityHint','RANDOM ORDER','orderTitle'],group:['♧','groupActivity','groupActivityHint','TEAM MAKER','groupTitle'],role:['✿','roleActivity','roleActivityHint','ROLE SHUFFLE','roleTitle'],pair:['⇄','pairActivity','pairActivityHint','TEAM MATCH','pairTitle'],review:['⟳','reviewActivity','reviewActivityHint','REVIEW CIRCUIT','reviewTitle']};
+const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',pairDisplay:'grid',reviewDisplay:'grid',roleTargetKind:'person',orderRevealIndex:0,groupRevealIndex:0,pairRevealIndex:0,reviewRevealIndex:0,groupMethod:'count',pairMethod:'size',order:[],groups:[],pairings:[],taskDraws:[],rolesAssigned:[],previousRoles:[],reviewRounds:[],mixerPairs:[],twistIndices:[],bingoRows:[],bingoMarks:new Set(),running:false,editingNew:false,editorSelection:new Set([0]),editorColumnsSignature:'',editorSingleColumnName:'姓名',importTable:null,lastWinner:null};
+const categories=[{id:'quick',key:'quickCategory',modes:['pick','task']},{id:'plan',key:'planCategory',modes:['order','group','role']},{id:'exchange',key:'exchangeCategory',modes:['pair','review']},{id:'creative',key:'creativeCategory',modes:['mixer','twist','bingo']}];
+const activityMeta={pick:['✧','pickActivity','pickActivityHint','LUCKY PICK','pickTitle'],task:['▣','taskActivity','taskActivityHint','CHALLENGE DRAW','taskTitle'],order:['☷','orderActivity','orderActivityHint','RANDOM ORDER','orderTitle'],group:['♧','groupActivity','groupActivityHint','TEAM MAKER','groupTitle'],role:['✿','roleActivity','roleActivityHint','ROLE SHUFFLE','roleTitle'],pair:['⇄','pairActivity','pairActivityHint','TEAM MATCH','pairTitle'],review:['⟳','reviewActivity','reviewActivityHint','REVIEW CIRCUIT','reviewTitle'],mixer:['✣','mixerActivity','mixerActivityHint','IDEA MIXER','mixerTitle'],twist:['⚡','twistActivity','twistActivityHint','TWIST CARDS','twistTitleMain'],bingo:['▦','bingoActivity','bingoActivityHint','CONVERSATION BINGO','bingoTitle']};
 const selectedKey={person:'selectedId',team:'selectedTeamId',task:'selectedTaskId',role:'selectedRoleId'};
 let toastTimer;
 let audioContext;
@@ -26,21 +26,38 @@ function tone(frequency,duration=.07,delay=0,volume=.035){
 function successSound(){tone(523,.12,0);tone(659,.12,.12);tone(784,.2,.24)}
 function shuffleSound(){tone(392,.06,0);tone(494,.06,.07);tone(587,.07,.14)}
 function renderSound(){const on=Boolean(state.data.soundEnabled);$('soundToggle').setAttribute('aria-pressed',String(on));$('soundToggle').title=t(on?'turnOffSound':'turnOnSound');$('soundToggle').querySelector('span').textContent=t(on?'soundOn':'soundOff')}
-const currentKind=()=>state.mode==='task'?'task':state.mode==='pair'||state.mode==='review'?'team':state.mode==='role'?state.roleTargetKind:'person';
+const currentKind=()=>['task','mixer','twist','bingo'].includes(state.mode)?'task':state.mode==='pair'||state.mode==='review'?'team':state.mode==='role'?state.roleTargetKind:'person';
 const rosterForKind=kind=>state.data.rosters.find(r=>r.kind===kind&&r.id===state.data[selectedKey[kind]])||state.data.rosters.find(r=>r.kind===kind);
 const roster=()=>rosterForKind(currentKind());
+const creativeSlot=mode=>({mixer:'topic',twist:'twist',bingo:'bingo'})[mode];
+const creativeDeck=slot=>state.data.rosters.find(r=>r.kind==='task'&&r.id===state.data.creativeDecks[slot])||rosterForKind('task');
+function renderCreativeDeckChoices(){
+  for(const [id,slot] of [['mixerTopicDeck','topic'],['mixerFormatDeck','format'],['twistDeck','twist'],['bingoDeck','bingo']]){
+    const select=$(id);select.replaceChildren(...state.data.rosters.filter(r=>r.kind==='task').map(r=>{const option=document.createElement('option');option.value=r.id;option.textContent=rosterName(r);return option}));select.value=creativeDeck(slot).id;
+  }
+}
 const demoTasksEnglish=[['Sketch your idea in 60 seconds','No words allowed'],['Explain from another angle','Speak from a different role'],['Find a counterexample','Share how it changes the conclusion'],['Pitch in one sentence','State the most important value'],['Ask three questions','Choose the one worth discussing'],['Swap perspectives','Restate the other person’s idea first']];
 const demoRolesEnglish=['Facilitator','Note taker','Presenter','Timekeeper','Questioner','Summarizer'];
+const demoCreativeEnglish={
+  'demo-topics':['Future classroom','Neighborhood café','Campus energy saving','Remote teamwork','City transport','Healthy lunch','Welcoming library','Rainy day activity','New student guide','Team ritual'],
+  'demo-formats':['One-minute pitch','Four-panel comic','Wordless poster','Role play','Three-sentence story','Short debate','Paper prototype','News headline','Interview questions','Elevator pitch'],
+  'demo-twists':['Time is suddenly cut in half','The budget shrinks by 30%','Beginners must be able to join','Add an audience with another view','Explain it with one image','Your partner suddenly changes','Use only materials nearby','Add an environmental constraint','Complete it outdoors','Choose a new presenter'],
+  'demo-bingo':['Something new you learned','A place you want to visit','A favorite food','A skill you are good at','Your favorite season','Something you watched recently','A sport you want to try','A childhood game','Something you appreciate','Music you like','A problem you recently solved','A language you want to learn','The most interesting class','A successful collaboration','A small goal','An animal you like','Your best team activity','Something you want to invent','A daily habit','A favorite holiday','A skill you would trade','A recent surprise','A good question','A tool you use often','How you feel today']
+};
 function localizedRow(row,r){
   if(getLanguage()!=='en')return row;
   if(r.id==='demo-teams'&&row[1]===`第 ${row[0]} 組`)return [row[0],t('sampleTeamName',{index:row[0]}),...row.slice(2)];
   if(r.id==='demo-tasks'){const index=r.rows.indexOf(row);if(JSON.stringify(row)===JSON.stringify(initialState.rosters[2].rows[index]))return demoTasksEnglish[index]||row}
   if(r.id==='demo-roles'){const index=r.rows.indexOf(row);if(JSON.stringify(row)===JSON.stringify(initialState.rosters[3].rows[index]))return [demoRolesEnglish[index],...row.slice(1)]}
+  if(demoCreativeEnglish[r.id]){const index=r.rows.indexOf(row),sample=initialState.rosters.find(item=>item.id===r.id);if(index>=0&&JSON.stringify(row)===JSON.stringify(sample?.rows[index]))return [demoCreativeEnglish[r.id][index],...row.slice(1)]}
   return row;
 }
 const label=(row,r=roster())=>formatRecord(localizedRow(row,r),r.columns,r.displayColumns);
-const rosterName=r=>({demo:'demoRoster','demo-teams':'demoTeamRoster','demo-tasks':'demoTaskRoster','demo-roles':'demoRoleRoster'})[r.id]&&r.name===({demo:'示範名單','demo-teams':'示範小組名單','demo-tasks':'示範任務卡','demo-roles':'示範角色卡'})[r.id]?t(({demo:'demoRoster','demo-teams':'demoTeamRoster','demo-tasks':'demoTaskRoster','demo-roles':'demoRoleRoster'})[r.id]):r.name;
-const columnName=(name,r)=>r?.id==='demo'&&name==='姓名'?t('memberName'):r?.id==='demo-teams'&&name==='組別編號'?t('teamIdColumn'):r?.id==='demo-teams'&&name==='組名'?t('teamNameColumn'):r?.id==='demo-tasks'&&name==='任務'?t('taskColumn'):r?.id==='demo-tasks'&&name==='提示'?t('taskHintColumn'):r?.id==='demo-roles'&&name==='角色'?t('roleColumn'):name;
+const creativeRows=slot=>{const deck=creativeDeck(slot);return [...new Map(deck.rows.map(row=>[label(row,deck),row])).values()]};
+const bingoPool=()=>creativeRows('bingo');
+const sampleNameKeys={demo:'demoRoster','demo-teams':'demoTeamRoster','demo-tasks':'demoTaskRoster','demo-roles':'demoRoleRoster','demo-topics':'demoTopics','demo-formats':'demoFormats','demo-twists':'demoTwists','demo-bingo':'demoBingo'};
+const rosterName=r=>sampleNameKeys[r.id]&&r.name===initialState.rosters.find(item=>item.id===r.id)?.name?t(sampleNameKeys[r.id]):r.name;
+const columnName=(name,r)=>r?.id==='demo'&&name==='姓名'?t('memberName'):r?.id==='demo-teams'&&name==='組別編號'?t('teamIdColumn'):r?.id==='demo-teams'&&name==='組名'?t('teamNameColumn'):r?.id==='demo-tasks'&&name==='任務'?t('taskColumn'):r?.id==='demo-tasks'&&name==='提示'?t('taskHintColumn'):r?.id==='demo-roles'&&name==='角色'?t('roleColumn'):r?.id==='demo-topics'&&name==='主題'?t('topicColumn'):r?.id==='demo-formats'&&name==='形式'?t('formatColumn'):r?.id==='demo-twists'&&name==='事件'?t('eventColumn'):r?.id==='demo-bingo'&&name==='話題'?t('promptColumn'):name;
 const defaultDisplay=(columns,kind='person')=>{
   if(kind==='team'){
     const id=columns.findIndex(name=>/^(組別編號|組號|小組編號|team number|group number|team id|group id)$/i.test(name));
@@ -95,16 +112,16 @@ function showPage(page){
   document.querySelector('.content').scrollTo({top:0});closeSidebarDrawer();
 }
 function applyPreset(preset){
-  const options={warmup:['pick','slot'],wheel:['pick','wheel'],cards:['pick','cards'],present:['order','reveal'],teams:['group','reveal'],peer:['pair','reveal'],challenge:['task',null],roles:['role',null],circuit:['review','reveal']};
+  const options={warmup:['pick','slot'],wheel:['pick','wheel'],cards:['pick','cards'],present:['order','reveal'],teams:['group','reveal'],peer:['pair','reveal'],challenge:['task',null],roles:['role',null],circuit:['review','reveal'],mixer:['mixer',null],twist:['twist',null],bingo:['bingo',null]};
   const [mode,display]=options[preset];showPage('playground');setMode(mode);
   if(mode==='pick')setDisplay(display);else if(mode==='order')setOrderDisplay(display);else if(mode==='group')setGroupDisplay(display);else if(mode==='pair')setPairDisplay(display);else if(mode==='review')setReviewDisplay(display);
-  palSays(t(({warmup:'warmupPal',wheel:'wheelPal',cards:'cardsPal',present:'presentPal',teams:'teamsPal',peer:'peerPal',challenge:'challengePal',roles:'rolesPal',circuit:'circuitPal'})[preset]));
+  palSays(t(({warmup:'warmupPal',wheel:'wheelPal',cards:'cardsPal',present:'presentPal',teams:'teamsPal',peer:'peerPal',challenge:'challengePal',roles:'rolesPal',circuit:'circuitPal',mixer:'mixerPal',twist:'twistPal',bingo:'bingoPal'})[preset]));
 }
 function renderContext(){
   const r=roster(),count=r.rows.length;
   ['pick','order','group','pair'].forEach(mode=>$(mode+'Context').classList.toggle('hidden',state.mode!==mode));
-  $('extraContext').classList.toggle('hidden',!['task','role','review'].includes(state.mode));
-  const titles={pick:['✧',uiText('抽選進度')],order:['☷',t('orderProgressTitle')],group:['♧',t('groupPlan')],pair:['⇄',t('pairPlan')],task:['▣',t('taskPlan')],role:['✿',t('rolePlan')],review:['⟳',t('reviewPlan')]};
+  $('extraContext').classList.toggle('hidden',!['task','role','review','mixer','twist','bingo'].includes(state.mode));
+  const titles={pick:['✧',uiText('抽選進度')],order:['☷',t('orderProgressTitle')],group:['♧',t('groupPlan')],pair:['⇄',t('pairPlan')],task:['▣',t('taskPlan')],role:['✿',t('rolePlan')],review:['⟳',t('reviewPlan')],mixer:['✣',t('mixerActivity')],twist:['⚡',t('twistActivity')],bingo:['▦',t('bingoActivity')]};
   setText('contextIcon',titles[state.mode][0]);setText('contextTitle',titles[state.mode][1]);
   setText('orderContextNumber',state.order.length||count);
   setText('orderContextDetail',state.order.length?t('orderProgressDetail',{count:state.order.length,progress:state.orderDisplay==='reveal'?t('orderRevealed',{count:state.orderRevealIndex}):t('fullListReady')}):(uiText('產生順序後，這裡會顯示完成進度。')));
@@ -131,16 +148,24 @@ function renderContext(){
     const rounds=state.reviewRounds.length||Math.min(Math.max(1,Math.floor(Number($('reviewRounds').value)||1)),Math.max(0,count-1));
     setText('extraContextNumber',rounds);setText('extraContextCaption',state.reviewRounds.length?t('reviewDone',{rounds}):t('reviewPlan'));
     setText('extraContextDetail',t('reviewReady',{rounds,teams:count}));
+  }else if(state.mode==='mixer'){
+    const total=creativeRows('topic').length*creativeRows('format').length-(creativeDeck('topic').id===creativeDeck('format').id?creativeRows('topic').length:0);
+    setText('extraContextNumber',Math.max(0,total-state.mixerPairs.length));setText('extraContextCaption',t('mixerRemaining'));setText('extraContextDetail',t('mixerUsed',{count:state.mixerPairs.length}));
+  }else if(state.mode==='twist'){
+    setText('extraContextNumber',Math.max(0,creativeRows('twist').length-state.twistIndices.length));setText('extraContextCaption',t('twistRemaining'));setText('extraContextDetail',t('twistUsed',{count:state.twistIndices.length}));
+  }else if(state.mode==='bingo'){
+    setText('extraContextNumber',state.bingoMarks.size);setText('extraContextCaption',t('bingoMarked'));setText('extraContextDetail',t('bingoCardCount',{count:state.bingoRows.length}));
   }
-  setText('contextPalText',({pick:uiText('咕嘎陪你抽出幸運兒！'),order:t('orderPal'),group:t('groupPal'),pair:t('pairPal'),task:t('taskPal'),role:t('rolePal'),review:t('reviewPal')})[state.mode]);
+  setText('contextPalText',({pick:uiText('咕嘎陪你抽出幸運兒！'),order:t('orderPal'),group:t('groupPal'),pair:t('pairPal'),task:t('taskPal'),role:t('rolePal'),review:t('reviewPal'),mixer:t('mixerPal'),twist:t('twistPal'),bingo:t('bingoPal')})[state.mode]);
 }
 function renderRosterChoices(){
   const selected=roster();
   $('rosterSelect').replaceChildren(...state.data.rosters.filter(r=>r.kind===currentKind()).map(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=rosterName(r);return o}));
   $('rosterSelect').value=selected.id;
-  $('rosterList').replaceChildren(...state.data.rosters.map(r=>{const b=document.createElement('button');b.type='button';b.className='roster-item'+(r.id===selected.id?' active':'');b.textContent=({person:'',team:'⇄ ',task:'▣ ',role:'✿ '})[r.kind]+rosterName(r);b.addEventListener('click',()=>selectRoster(r.id));return b}));
+  $('rosterList').replaceChildren(...state.data.rosters.filter(r=>!['demo-topics','demo-formats','demo-twists','demo-bingo'].includes(r.id)||r.id===selected.id).map(r=>{const b=document.createElement('button');b.type='button';b.className='roster-item'+(r.id===selected.id?' active':'');b.textContent=({person:'',team:'⇄ ',task:'▣ ',role:'✿ '})[r.kind]+rosterName(r);b.addEventListener('click',()=>selectRoster(r.id));return b}));
   $('roleDeckSelect').replaceChildren(...state.data.rosters.filter(r=>r.kind==='role').map(r=>{const option=document.createElement('option');option.value=r.id;option.textContent=rosterName(r);return option}));
   $('roleDeckSelect').value=rosterForKind('role').id;$('roleTargetKind').value=state.roleTargetKind;
+  renderCreativeDeckChoices();
 }
 function renderStats(){
   const r=roster(),remaining=r.rows.filter((_,i)=>!r.picked.includes(i));
@@ -151,6 +176,9 @@ function renderStats(){
   $('pickBtn').disabled=state.running||!r.rows.length;
   $('orderBtn').disabled=!rosterForKind('person').rows.length;$('groupBtn').disabled=!rosterForKind('person').rows.length;$('pairBtn').disabled=rosterForKind('team').rows.length<2;
   $('taskBtn').disabled=!rosterForKind('task').rows.length;$('roleBtn').disabled=!r.rows.length||!rosterForKind('role').rows.length;$('reviewBtn').disabled=rosterForKind('team').rows.length<2;
+  $('mixerBtn').disabled=!creativeRows('topic').length||!creativeRows('format').length||creativeDeck('topic').id===creativeDeck('format').id&&creativeRows('topic').length<2;
+  $('twistBtn').disabled=!creativeRows('twist').length;
+  const bingoNeed=Number($('bingoSize').value)**2;$('bingoBtn').disabled=bingoPool().length<bingoNeed;setText('bingoHint',t('bingoNeed',{count:bingoNeed,available:bingoPool().length}));
   setText('roleHint',t('roleHint',{roles:Math.min(rosterForKind('role').rows.length,r.rows.length),targets:r.rows.length}));
   const maxReviewRounds=Math.max(1,rosterForKind('team').rows.length-1);$('reviewRounds').max=String(maxReviewRounds);
   if(Number($('reviewRounds').value)>maxReviewRounds)$('reviewRounds').value=String(maxReviewRounds);
@@ -158,7 +186,7 @@ function renderStats(){
   updatePairHint();
   if(state.display!=='wheel')drawWheel();
 }
-function render(){renderRosterChoices();renderStats();renderRosterStudio();renderActivityBrowser();renderTaskResult();renderRoleResult();renderReviewResult();drawWheel();renderSound()}
+function render(){renderRosterChoices();renderStats();renderRosterStudio();renderActivityBrowser();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();drawWheel();renderSound()}
 function renderLanguageSwitch(){
   $('languageSwitch').dataset.language=getLanguage();
   document.querySelectorAll('.language-option').forEach(button=>{
@@ -172,7 +200,7 @@ function renderLocalized(){
   if(state.order.length)renderOrderResult();else setText('orderResult',uiText('點擊下方按鈕產生順序'));
   if(state.groups.length)renderGroupResult();else setText('groupResult',uiText('點擊下方按鈕產生分組'));
   if(state.pairings.length)renderPairResult();else setText('pairResult',uiText('點擊下方按鈕產生配對'));
-  renderOrderReveal();renderGroupReveal();renderPairReveal();renderTaskResult();renderRoleResult();renderReviewResult();
+  renderOrderReveal();renderGroupReveal();renderPairReveal();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();
   if(state.lastWinner){setText('slotName',state.lastWinner);setText('stageSub',t('pickedSub',{name:state.lastWinner}));setText('pickNote',t('pickedNote',{name:state.lastWinner}));setText('pickBtn',t('pickAgain'));setText('palMessage',t('pickedPal',{name:state.lastWinner}))}
   else{setText('slotName',uiText('點擊開始抽選'));setText('stageSub',uiText('每個人都有一樣的機會'));setText('pickBtn',uiText('開始抽選')+' →');setText('palMessage',uiText('嗨！選個玩法，我陪你一起玩。'))}
   if($('rosterDialog').open){updateEditorCount();renderEditorKind()}updateProjectionButton();
@@ -190,23 +218,25 @@ function selectRoster(id){
   if(state.running)return;
   const selected=state.data.rosters.find(r=>r.id===id);if(!selected)return;
   state.data[selectedKey[selected.kind]]=id;
+  if(selected.kind==='task'&&creativeSlot(state.mode))state.data.creativeDecks[creativeSlot(state.mode)]=id;
+  else if(selected.kind==='task')state.data.selectedNormalTaskId=id;
   if(selected.kind==='role')setMode('role');
   else if(state.mode==='role'&&['person','team'].includes(selected.kind)){state.roleTargetKind=selected.kind;setMode('role')}
   else if(selected.kind!==currentKind())setMode(({person:'group',team:'pair',task:'task'})[selected.kind]);
   clearResults();persist();render();closeSidebarDrawer();
 }
 function clearResults(){
-  state.order=[];state.groups=[];state.pairings=[];state.taskDraws=[];state.rolesAssigned=[];state.previousRoles=[];state.reviewRounds=[];
+  state.order=[];state.groups=[];state.pairings=[];state.taskDraws=[];state.rolesAssigned=[];state.previousRoles=[];state.reviewRounds=[];state.mixerPairs=[];state.twistIndices=[];state.bingoRows=[];state.bingoMarks.clear();
   state.lastWinner=null;setText('pickBtn',uiText('開始抽選')+' →');setText('slotName',uiText('點擊開始抽選'));setText('stageSub',uiText('每個人都有一樣的機會'));setText('pickNote','');
   document.querySelectorAll('.mystery-card').forEach(card=>{card.classList.remove('selected');card.querySelector('.card-front').textContent=''});
   $('orderResult').className='result-list empty-result';$('orderResult').classList.toggle('hidden',state.orderDisplay!=='list');setText('orderResult',uiText('點擊下方按鈕產生順序'));
   $('groupResult').className='group-result empty-result';$('groupResult').classList.toggle('hidden',state.groupDisplay!=='grid');setText('groupResult',uiText('點擊下方按鈕產生分組'));
   $('pairResult').className='group-result empty-result';$('pairResult').classList.toggle('hidden',state.pairDisplay!=='grid');setText('pairResult',uiText('點擊下方按鈕產生配對'));
-  state.orderRevealIndex=0;state.groupRevealIndex=0;state.pairRevealIndex=0;state.reviewRevealIndex=0;renderOrderReveal();renderGroupReveal();renderPairReveal();renderTaskResult();renderRoleResult();renderReviewResult();
-  for(const id of ['copyOrder','copyGroup','copyPair','copyTask','copyRole','copyReview','exportOrder','exportGroup','exportPair','exportTask','exportRole','exportReview'])$(id).disabled=true;
+  state.orderRevealIndex=0;state.groupRevealIndex=0;state.pairRevealIndex=0;state.reviewRevealIndex=0;renderOrderReveal();renderGroupReveal();renderPairReveal();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();
+  for(const id of ['copyOrder','copyGroup','copyPair','copyTask','copyRole','copyReview','copyMixer','copyTwist','exportOrder','exportGroup','exportPair','exportTask','exportRole','exportReview','exportMixer','exportTwist','exportBingo','printBingo'])$(id).disabled=true;
   renderContext();
 }
-function setMode(mode){state.mode=mode;document.body.classList.toggle('stage-pick',mode==='pick');for(const key of Object.keys(activityMeta))$(key+'Panel').classList.toggle('hidden',key!==mode);setText('cardKicker',activityMeta[mode][3]);setText('cardTitle',t(activityMeta[mode][4]));renderActivityBrowser();renderRosterChoices();renderStats();renderRosterStudio()}
+function setMode(mode){if(state.mode==='task'&&mode!=='task')state.data.selectedNormalTaskId=state.data.selectedTaskId;state.mode=mode;const slot=creativeSlot(mode);if(slot)state.data.selectedTaskId=creativeDeck(slot).id;else if(mode==='task')state.data.selectedTaskId=state.data.selectedNormalTaskId;document.body.classList.toggle('stage-pick',mode==='pick');for(const key of Object.keys(activityMeta))$(key+'Panel').classList.toggle('hidden',key!==mode);setText('cardKicker',activityMeta[mode][3]);setText('cardTitle',t(activityMeta[mode][4]));renderActivityBrowser();renderRosterChoices();renderStats();renderRosterStudio();renderContext()}
 function setDisplay(display){if(state.running)return;state.display=display;document.querySelectorAll('[data-display]').forEach(b=>b.classList.toggle('selected',b.dataset.display===display));$('slotStage').classList.toggle('hidden',display!=='slot');$('wheelStage').classList.toggle('hidden',display!=='wheel');$('cardStage').classList.toggle('hidden',display!=='cards');drawWheel()}
 function setOrderDisplay(display){state.orderDisplay=display;document.querySelectorAll('[data-order-display]').forEach(b=>b.classList.toggle('selected',b.dataset.orderDisplay===display));$('orderResult').classList.toggle('hidden',display!=='list');$('orderReveal').classList.toggle('hidden',display!=='reveal');renderOrderReveal();renderContext()}
 function setGroupDisplay(display){state.groupDisplay=display;document.querySelectorAll('[data-group-display]').forEach(b=>b.classList.toggle('selected',b.dataset.groupDisplay===display));$('groupResult').classList.toggle('hidden',display!=='grid');$('groupReveal').classList.toggle('hidden',display!=='reveal');renderGroupReveal();renderContext()}
@@ -348,6 +378,48 @@ function generateReview(){
   state.reviewRounds=makeReviewCircuit(r.rows,$('reviewRounds').value);state.reviewRevealIndex=0;shuffleSound();renderReviewResult();renderContext();palSays(t('reviewAssignedPal'));
 }
 function revealReview(){if(state.reviewRevealIndex>=state.reviewRounds.length)return;state.reviewRevealIndex++;renderReviewReveal();animateReveal('revealReviewBtn');renderContext();tone(523,.09);tone(659,.12,.1)}
+function renderMixerResult(){
+  const topic=creativeDeck('topic'),format=creativeDeck('format'),topics=creativeRows('topic'),formats=creativeRows('format'),last=state.mixerPairs.at(-1);
+  setText('mixerTopic',last?label(topics[last[0]],topic):'？');setText('mixerFormat',last?label(formats[last[1]],format):'？');
+  $('mixerHistory').replaceChildren(...state.mixerPairs.map((pair,i)=>{const chip=document.createElement('span');chip.textContent=`${i+1}. ${label(topics[pair[0]],topic)} + ${label(formats[pair[1]],format)}`;return chip}));
+  $('copyMixer').disabled=!last;$('exportMixer').disabled=!last;
+  const total=topics.length*formats.length-(topic.id===format.id?topics.length:0);
+  setText('mixerHint',t('mixerHint',{left:Math.max(0,total-state.mixerPairs.length),total}));
+}
+function generateMixer(){
+  const topic=creativeDeck('topic'),format=creativeDeck('format'),pair=drawIdeaPair(creativeRows('topic'),creativeRows('format'),state.mixerPairs,topic.id===format.id);
+  if(!pair){notify(t('mixerEmpty'));return}state.mixerPairs.push(pair);shuffleSound();renderMixerResult();renderContext();palSays(t('mixerPal'));
+}
+function renderTwistResult(){
+  const deck=creativeDeck('twist'),rows=creativeRows('twist'),index=state.twistIndices.at(-1),last=index===undefined?null:rows[index];
+  if(last){const parts=deck.displayColumns.map(i=>localizedRow(last,deck)[i]).filter(Boolean);setText('twistTitle',parts[0]||'—');setText('twistDetail',parts.slice(1).join(' · ')||t('twistUsed',{count:state.twistIndices.length}))}
+  else{setText('twistTitle',t('twistReady'));setText('twistDetail',t('twistReadyHint'))}
+  $('twistStage').classList.toggle('opened',Boolean(last));$('twistHistory').replaceChildren(...state.twistIndices.map((i,n)=>{const chip=document.createElement('span');chip.textContent=`${n+1}. ${label(rows[i],deck)}`;return chip}));
+  $('copyTwist').disabled=!last;$('exportTwist').disabled=!last;setText('twistHint',t('twistHint',{left:Math.max(0,rows.length-state.twistIndices.length)}));
+}
+function generateTwist(){
+  const pool=creativeRows('twist').map((_,i)=>i).filter(i=>!state.twistIndices.includes(i));if(!pool.length){notify(t('twistEmpty'));return}
+  state.twistIndices.push(pool[randomInt(pool.length)]);shuffleSound();renderTwistResult();renderContext();palSays(t('twistPal'));
+}
+function bingoWins(size){
+  if(!state.bingoRows.length)return 0;const marked=state.bingoMarks,lines=[];
+  for(let n=0;n<size;n++){lines.push(Array.from({length:size},(_,i)=>n*size+i));lines.push(Array.from({length:size},(_,i)=>i*size+n))}
+  lines.push(Array.from({length:size},(_,i)=>i*size+i),Array.from({length:size},(_,i)=>i*size+size-1-i));
+  return lines.filter(line=>line.every(i=>marked.has(i))).length;
+}
+function renderBingoResult(){
+  const board=$('bingoBoard'),size=Number($('bingoSize').value),deck=creativeDeck('bingo');board.style.setProperty('--bingo-size',size);
+  if(!state.bingoRows.length){board.replaceChildren((()=>{const p=document.createElement('p');p.textContent=t('bingoReady');return p})());setText('bingoHint',t('bingoNeed',{count:size*size,available:bingoPool().length}))}
+  else{
+    board.replaceChildren(...state.bingoRows.map((row,i)=>{const cell=document.createElement('button');cell.type='button';cell.className='bingo-cell'+(state.bingoMarks.has(i)?' marked':'');cell.setAttribute('aria-pressed',String(state.bingoMarks.has(i)));cell.textContent=label(row,deck);cell.addEventListener('click',()=>{const before=bingoWins(size);state.bingoMarks.has(i)?state.bingoMarks.delete(i):state.bingoMarks.add(i);renderBingoResult();renderContext();if(bingoWins(size)>before)successSound()});return cell}));
+    setText('bingoHint',t('bingoProgress',{marked:state.bingoMarks.size,total:state.bingoRows.length,lines:bingoWins(size)}));
+  }
+  $('printBingo').disabled=!state.bingoRows.length;$('exportBingo').disabled=!state.bingoRows.length;
+}
+function generateBingo(){
+  const size=Number($('bingoSize').value);state.bingoRows=makeBingoCard(bingoPool(),size);if(!state.bingoRows.length){notify(t('bingoNeed',{count:size*size,available:bingoPool().length}));return}
+  state.bingoMarks.clear();shuffleSound();renderBingoResult();renderContext();palSays(t('bingoPal'));
+}
 function downloadCsv(filename,columns,rows){
   const safe=value=>{let text=String(value??'');if(/^[=+@-]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"'};
   const csv='\uFEFF'+[columns,...rows].map(row=>row.map(safe).join(',')).join('\r\n');
@@ -384,11 +456,11 @@ function saveEditor(event){
   if(!name){notify(t('enterRosterName'));return}if(!data.rows.length){notify(t('needRow'));return}
   const displayColumns=[...state.editorSelection].filter(i=>i<data.columns.length).sort((a,b)=>a-b);
   if(!displayColumns.length){notify(t('needDisplayColumn'));return}
-  if(state.editingNew){const id=crypto.randomUUID(),kind=$('rosterKind').value;state.data.rosters.push({id,kind,name,...data,displayColumns,picked:[]});state.data[selectedKey[kind]]=id;setMode(({person:'group',team:'pair',task:'task',role:'role'})[kind])}
+  if(state.editingNew){const id=crypto.randomUUID(),kind=$('rosterKind').value;state.data.rosters.push({id,kind,name,...data,displayColumns,picked:[]});state.data[selectedKey[kind]]=id;const slot=kind==='task'?creativeSlot(state.mode):null;if(slot)state.data.creativeDecks[slot]=id;else if(kind==='task')state.data.selectedNormalTaskId=id;setMode(slot?state.mode:({person:'group',team:'pair',task:'task',role:'role'})[kind])}
   else{const r=rosterForKind($('rosterKind').value);Object.assign(r,{name,...data,displayColumns,picked:[]})}
   persist();clearResults();render();$('rosterDialog').close();notify(t('rosterSaved'));
 }
-function deleteRoster(){const selected=rosterForKind($('rosterKind').value);if(state.data.rosters.filter(r=>r.kind===selected.kind).length===1)return;state.data.rosters=state.data.rosters.filter(r=>r.id!==selected.id);state.data[selectedKey[selected.kind]]=state.data.rosters.find(r=>r.kind===selected.kind).id;persist();clearResults();render();$('rosterDialog').close();notify(t('rosterDeleted'))}
+function deleteRoster(){const selected=rosterForKind($('rosterKind').value);if(state.data.rosters.filter(r=>r.kind===selected.kind).length===1)return;state.data.rosters=state.data.rosters.filter(r=>r.id!==selected.id);state.data[selectedKey[selected.kind]]=state.data.rosters.find(r=>r.kind===selected.kind).id;if(selected.kind==='task'){if(state.data.selectedNormalTaskId===selected.id)state.data.selectedNormalTaskId=state.data.selectedTaskId;for(const slot of Object.keys(state.data.creativeDecks))if(state.data.creativeDecks[slot]===selected.id)state.data.creativeDecks[slot]=state.data.selectedTaskId}persist();clearResults();render();$('rosterDialog').close();notify(t('rosterDeleted'))}
 async function importFile(file){
   if(!file)return;
   try{
@@ -464,18 +536,28 @@ function bind(){
   $('roleBtn').addEventListener('click',generateRoles);$('roleTargetKind').addEventListener('change',event=>{state.roleTargetKind=event.target.value;clearResults();setMode('role')});
   $('roleDeckSelect').addEventListener('change',event=>{state.data.selectedRoleId=event.target.value;clearResults();persist();render()});$('editRoleDeck').addEventListener('click',()=>openEditor(false,'role'));
   $('reviewBtn').addEventListener('click',generateReview);$('reviewRounds').addEventListener('input',()=>{clearReview();renderStats()});
+  for(const [id,slot] of [['mixerTopicDeck','topic'],['mixerFormatDeck','format'],['twistDeck','twist'],['bingoDeck','bingo']])$(id).addEventListener('change',event=>{state.data.creativeDecks[slot]=event.target.value;if(slot!=='format')state.data.selectedTaskId=event.target.value;clearResults();persist();render()});
+  $('editMixerDeck').addEventListener('click',()=>{state.data.selectedTaskId=creativeDeck('topic').id;openEditor(false,'task')});$('editTwistDeck').addEventListener('click',()=>{state.data.selectedTaskId=creativeDeck('twist').id;openEditor(false,'task')});$('editBingoDeck').addEventListener('click',()=>{state.data.selectedTaskId=creativeDeck('bingo').id;openEditor(false,'task')});
+  $('mixerBtn').addEventListener('click',generateMixer);$('resetMixer').addEventListener('click',()=>{state.mixerPairs=[];renderMixerResult();renderContext()});
+  $('twistBtn').addEventListener('click',generateTwist);$('resetTwist').addEventListener('click',()=>{state.twistIndices=[];renderTwistResult();renderContext()});
+  $('bingoSize').addEventListener('change',()=>{state.bingoRows=[];state.bingoMarks.clear();renderStats();renderBingoResult();renderContext()});$('bingoBtn').addEventListener('click',generateBingo);$('resetBingo').addEventListener('click',()=>{state.bingoMarks.clear();renderBingoResult();renderContext()});$('printBingo').addEventListener('click',()=>window.print());
   $('copyOrder').addEventListener('click',()=>copy(state.order.map((row,i)=>`${i+1}. ${label(row)}`).join('\n')));
   $('copyGroup').addEventListener('click',()=>copy(state.groups.map((group,i)=>`${t('groupNumber',{index:i+1})}\n${group.map(row=>label(row)).join(getLanguage()==='en'?', ':'、')}`).join('\n\n')));
   $('copyPair').addEventListener('click',()=>copy(state.pairings.map((match,i)=>`${t('pairNumber',{index:i+1})}\n${match.map(row=>label(row,rosterForKind('team'))).join(getLanguage()==='en'?', ':'、')}`).join('\n\n')));
   $('copyTask').addEventListener('click',()=>copy(state.taskDraws.map((row,i)=>`${i+1}. ${label(row,rosterForKind('task'))}`).join('\n')));
   $('copyRole').addEventListener('click',()=>copy(state.rolesAssigned.map(({target,role})=>`${label(target,rosterForKind(state.roleTargetKind))} → ${label(role,rosterForKind('role'))}`).join('\n')));
   $('copyReview').addEventListener('click',()=>copy(state.reviewRounds.map((round,i)=>`${t('reviewRound',{index:i+1})}\n${round.map(({reviewer,subject})=>t('reviewLink',{from:label(reviewer,rosterForKind('team')),to:label(subject,rosterForKind('team'))})).join('\n')}`).join('\n\n')));
+  $('copyMixer').addEventListener('click',()=>copy(state.mixerPairs.map((pair,i)=>`${i+1}. ${label(creativeRows('topic')[pair[0]],creativeDeck('topic'))} + ${label(creativeRows('format')[pair[1]],creativeDeck('format'))}`).join('\n')));
+  $('copyTwist').addEventListener('click',()=>copy(state.twistIndices.map((i,n)=>`${n+1}. ${label(creativeRows('twist')[i],creativeDeck('twist'))}`).join('\n')));
   $('exportOrder').addEventListener('click',()=>downloadCsv(`${roster().name}-${t('orderFile')}.csv`,[t('orderColumn'),...roster().columns],state.order.map((row,i)=>[i+1,...row])));
   $('exportGroup').addEventListener('click',()=>downloadCsv(`${roster().name}-${t('groupFile')}.csv`,[t('groupColumn'),...roster().columns],state.groups.flatMap((group,i)=>group.map(row=>[i+1,...row]))));
   $('exportPair').addEventListener('click',()=>{const r=rosterForKind('team');downloadCsv(`${r.name}-${t('pairFile')}.csv`,[t('pairColumn'),...r.columns],state.pairings.flatMap((match,i)=>match.map(row=>[i+1,...row])))});
   $('exportTask').addEventListener('click',()=>{const r=rosterForKind('task');downloadCsv(`${r.name}-${t('taskFile')}.csv`,r.columns,state.taskDraws)});
   $('exportRole').addEventListener('click',()=>{const target=rosterForKind(state.roleTargetKind),roles=rosterForKind('role');downloadCsv(`${roles.name}-${t('roleFile')}.csv`,[...target.columns.map(column=>`${t('roleTargetColumn')} · ${column}`),...roles.columns.map(column=>`${t('roleColumn')} · ${column}`)],state.rolesAssigned.map(pair=>[...pair.target,...pair.role]))});
   $('exportReview').addEventListener('click',()=>{const r=rosterForKind('team');downloadCsv(`${r.name}-${t('reviewFile')}.csv`,[t('reviewRoundColumn'),...r.columns.map(column=>`${t('reviewerColumn')} · ${column}`),...r.columns.map(column=>`${t('revieweeColumn')} · ${column}`)],state.reviewRounds.flatMap((round,i)=>round.map(({reviewer,subject})=>[i+1,...reviewer,...subject]))) });
+  $('exportMixer').addEventListener('click',()=>{const a=creativeDeck('topic'),b=creativeDeck('format'),left=creativeRows('topic'),right=creativeRows('format');downloadCsv(`${t('mixerFile')}.csv`,[t('orderColumn'),...a.columns.map(c=>`${t('topicColumn')} · ${c}`),...b.columns.map(c=>`${t('formatColumn')} · ${c}`)],state.mixerPairs.map(([i,j],n)=>[n+1,...left[i],...right[j]]))});
+  $('exportTwist').addEventListener('click',()=>{const deck=creativeDeck('twist'),rows=creativeRows('twist');downloadCsv(`${deck.name}-${t('twistFile')}.csv`,[t('orderColumn'),...deck.columns],state.twistIndices.map((i,n)=>[n+1,...rows[i]]))});
+  $('exportBingo').addEventListener('click',()=>{const deck=creativeDeck('bingo'),size=Number($('bingoSize').value);downloadCsv(`${deck.name}-${t('bingoFile')}.csv`,[t('bingoRowColumn'),t('bingoColColumn'),t('bingoMarkedColumn'),...deck.columns],state.bingoRows.map((row,i)=>[Math.floor(i/size)+1,i%size+1,state.bingoMarks.has(i)?t('yes'):t('no'),...row]))});
   $('openTab').addEventListener('click',openTab);$('homeLink').addEventListener('click',()=>showPage('playground'));
   $('rosterStudioLink').addEventListener('click',()=>showPage('studio'));$('ideasLink').addEventListener('click',()=>showPage('ideas'));
   $('studioAdd').addEventListener('click',()=>openEditor(true));$('studioImport').addEventListener('click',()=>{openEditor(true);$('importFile').click()});

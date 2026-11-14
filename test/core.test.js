@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -47,6 +47,19 @@ test('review circuit assigns each team a different reviewer in each round',()=>{
     const subjects=circuit.flat().filter(pair=>pair.reviewer===team).map(pair=>pair.subject);
     assert.equal(new Set(subjects).size,4);
   }
+});
+test('idea mixer uses every pair once and skips self-pairs for one deck',()=>{
+  const rows=['A','B','C'].map(value=>[value]),used=[];
+  for(let i=0;i<6;i++){const pair=drawIdeaPair(rows,rows,used,true);assert.ok(pair);assert.notEqual(pair[0],pair[1]);used.push(pair)}
+  assert.equal(new Set(used.map(pair=>pair.join(':'))).size,6);
+  assert.equal(drawIdeaPair(rows,rows,used,true),null);
+});
+test('bingo cards have unique complete grids at supported sizes',()=>{
+  const prompts=Array.from({length:25},(_,i)=>[String(i)]);
+  for(const size of [3,4,5]){const card=makeBingoCard(prompts,size);assert.equal(card.length,size*size);assert.equal(new Set(card).size,size*size)}
+  assert.deepEqual(makeBingoCard(prompts.slice(0,8),3),[]);
+  assert.deepEqual(makeBingoCard([...prompts.slice(0,8),prompts[0]],3),[]);
+  assert.deepEqual(makeBingoCard(prompts,6),[]);
 });
 test('CSV import handles quoted commas and a name header',()=>{
   const rows=parseCsv('姓名,組別\r\n"王,小明",A\r\n陳小華,B\r\n');
