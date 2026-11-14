@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,assignSeats,startBracket,makeBracketRound,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,assignSeats,startBracket,makeBracketRound,completeBracket,advanceBracket,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -84,12 +84,34 @@ test('seat shuffle respects availability and accounts for people without seats',
   assert.deepEqual([...result.assignments.map(item=>item.person),...result.unseated].sort((a,b)=>a-b),[0,1,2,3,4]);
   assert.deepEqual(result.assignments.map(item=>item.seat).sort((a,b)=>a-b),[0,2,4]);
 });
-test('bracket pairs everyone once and advances odd entrants with a bye',()=>{
+test('bracket prebuilds every round and advances winners as soon as each match ends',()=>{
   const rounds=startBracket(5);
-  assert.equal(rounds.length,1);
+  assert.deepEqual(rounds.map(round=>round.length),[4,2,1]);
   assert.deepEqual(rounds[0].flatMap(match=>[match.a,match.b].filter(value=>value!==null)).sort((a,b)=>a-b),[0,1,2,3,4]);
-  assert.equal(rounds[0].filter(match=>match.b===null&&match.winner===match.a).length,1);
+  assert.equal(rounds[0].filter(match=>match.b===null&&match.winner===match.a).length,3);
+  const played=rounds[0].findIndex(match=>match.b!==null),first=rounds[0][played];
+  assert.equal(advanceBracket(rounds,0,played,first.a),true);
+  assert.equal(rounds[1][Math.floor(played/2)][played%2?'b':'a'],first.a);
+  const other=rounds[0].findIndex((match,index)=>index!==played&&match.winner!==null&&Math.floor(index/2)===Math.floor(played/2));
+  if(other>=0){
+    const next=rounds[1][Math.floor(played/2)];
+    assert.equal(advanceBracket(rounds,1,Math.floor(played/2),first.a),true);
+    assert.equal(rounds[2][0][Math.floor(played/2)?'b':'a'],first.a);
+    assert.equal(advanceBracket(rounds,0,played,first.b),true);
+    assert.equal(next.winner,null);
+  }
   assert.deepEqual(makeBracketRound([2,4,1]),[{a:2,b:4,winner:null},{a:1,b:null,winner:1}]);
+});
+test('complete bracket reaches a champion and existing partial rounds remain usable',()=>{
+  const rounds=startBracket(8);
+  for(let roundIndex=0;roundIndex<rounds.length;roundIndex++)for(let matchIndex=0;matchIndex<rounds[roundIndex].length;matchIndex++){
+    const match=rounds[roundIndex][matchIndex];
+    assert.equal(advanceBracket(rounds,roundIndex,matchIndex,match.a),true);
+  }
+  assert.notEqual(rounds.at(-1)[0].winner,null);
+  const legacy=[makeBracketRound([0,1,2,3,4])];
+  assert.deepEqual(completeBracket(legacy).map(round=>round.length),[3,2,1]);
+  assert.equal(legacy[1][1].winner,4);
 });
 test('CSV import handles quoted commas and a name header',()=>{
   const rows=parseCsv('姓名,組別\r\n"王,小明",A\r\n陳小華,B\r\n');

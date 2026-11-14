@@ -109,7 +109,34 @@ export function makeBracketRound(entrants){
   for(let i=0;i<entrants.length;i+=2)matches.push({a:entrants[i],b:entrants[i+1]??null,winner:entrants[i+1]===undefined?entrants[i]:null});
   return matches;
 }
-export function startBracket(total){return total<2?[]:[makeBracketRound(shuffle(Array.from({length:total},(_,i)=>i)))]}
+export function completeBracket(rounds){
+  if(!rounds.length)return rounds;
+  let size=rounds[0].length;
+  for(let index=1;size>1;index++){
+    size=Math.ceil(size/2);
+    rounds[index]??=Array.from({length:size},()=>({a:null,b:null,winner:null}));
+  }
+  for(let index=1;index<rounds.length;index++)for(let matchIndex=0;matchIndex<rounds[index].length;matchIndex++){
+    const match=rounds[index][matchIndex],left=rounds[index-1][matchIndex*2],right=rounds[index-1][matchIndex*2+1];
+    match.a=left?.winner??null;match.b=right?.winner??null;
+    if(right===undefined)match.winner=match.a;
+    else if(match.winner!==match.a&&match.winner!==match.b)match.winner=null;
+  }
+  return rounds;
+}
+export function startBracket(total){
+  if(total<2)return [];
+  const slots=2**Math.ceil(Math.log2(total)),matchCount=slots/2,byes=slots-total,entrants=shuffle(Array.from({length:total},(_,i)=>i));
+  const first=shuffle(Array.from({length:matchCount},(_,i)=>i<matchCount-byes
+    ?{a:entrants[i*2],b:entrants[i*2+1],winner:null}
+    :{a:entrants[(matchCount-byes)*2+i-(matchCount-byes)],b:null,winner:entrants[(matchCount-byes)*2+i-(matchCount-byes)]}));
+  return completeBracket([first]);
+}
+export function advanceBracket(rounds,roundIndex,matchIndex,winner){
+  const match=rounds[roundIndex]?.[matchIndex];
+  if(!match||match.a===null||match.b===null||![match.a,match.b].includes(winner))return false;
+  match.winner=winner;completeBracket(rounds);return true;
+}
 export function parseDelimited(text,delimiter=','){
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++){
