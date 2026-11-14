@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -14,6 +14,17 @@ test('groups preserve members and differ by at most one',()=>{
     assert.deepEqual(groups.flat().sort(),[...input].sort());
     assert.ok(Math.max(...groups.map(g=>g.length))-Math.min(...groups.map(g=>g.length))<=1);
   }
+});
+test('team matching keeps whole rows and never leaves one team alone',()=>{
+  const teams=Array.from({length:5},(_,i)=>[String(i+1),`第 ${i+1} 組`,String(i+3)]);
+  for(const [method,number] of [['size',2],['count',3]]){
+    const matches=makeTeamMatches(teams,method,number);
+    assert.equal(matches.length,2);
+    assert.deepEqual(matches.map(match=>match.length).sort(),[2,3]);
+    assert.deepEqual(matches.flat().sort((a,b)=>a[0]-b[0]),teams);
+  }
+  assert.deepEqual(planTeamMatches(8,'size',3).sizes,[3,3,2]);
+  assert.deepEqual(makeTeamMatches([teams[0]],'size',2),[]);
 });
 test('CSV import handles quoted commas and a name header',()=>{
   const rows=parseCsv('姓名,組別\r\n"王,小明",A\r\n陳小華,B\r\n');

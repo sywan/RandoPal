@@ -251,6 +251,13 @@ footer{margin:18px 0 6px}
 .version-badge{color:#4c91ce;background:#eaf5ff;border-radius:8px;padding:5px 7px;font-size:11px;font-weight:800;white-space:nowrap}
 .pal-downloads{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px}.pal-downloads a{color:#3e83bd;font-size:10px;font-weight:750;text-decoration:none}.pal-downloads a:hover{text-decoration:underline}
 
+.mode-tabs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}
+.mode-tab{padding:10px 8px;white-space:nowrap}
+.pair-help{font-size:13px;line-height:1.6;color:#6685a2;background:#f3f9ff;border-radius:10px;padding:10px 12px;margin:0 0 12px}
+#pairHint{display:block;font-size:12px;color:#6f95b5}
+#rosterRowsLabel{font-weight:750;color:#54718d}
+@media(max-width:760px){.mode-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}.mode-tab{width:100%}}
+
 /* Keep the live pick tally visible beside the large presentation stage. */
 .stage-view.stage-pick .work-grid{grid-template-columns:minmax(0,1fr) minmax(240px,270px);align-items:start}
 .stage-view.stage-pick .info-card{display:block;position:sticky;top:70px;min-height:0;padding:21px 18px}

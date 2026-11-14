@@ -1,6 +1,6 @@
 # RandoPal
 
-**公開網頁版：V0.56**。Chrome 擴充功能維持 **V0.55**（manifest 版本 `0.55.0`）。
+**公開網頁版：V0.57**。Chrome 擴充功能維持 **V0.55**（manifest 版本 `0.55.0`）。
 
 RandoPal 提供名單隨機抽選、排序與平均分組。抽選有跑馬燈、幸運轉盤和翻牌；排序與分組有逐步揭曉模式。可匯入 CSV、TXT、XLSX，保留每一列的多欄資料，並選擇結果顯示哪些欄位。介面支援繁體中文和英文，頂部用「繁中 / EN」切換。
 
@@ -17,6 +17,8 @@ RandoPal 提供名單隨機抽選、排序與平均分組。抽選有跑馬燈�
 
 程式入口為 `index.html`；畫面在 `styles.css` 和 `src/app.js`，隨機與匯入邏輯在 `src/core.js`、`src/xlsx.js`，翻譯在 `src/i18n.js`。擴充功能使用 `manifest.json` 與 `_locales/`。詳細的翻譯維護方式見 [I18N.md](I18N.md)。
 
-網頁版 V0.56 使用使用者選定的咕嘎舞步：1000 × 925 像素、150 張影格、約 12 秒透明循環。側欄與右側資訊卡播放其轉製的 `icons/guga-pal-web-v056.webp`，並提供與使用者提供檔案位元相同的 `icons/guga-pal-web-v056.gif` 下載。Chrome V0.55 套件維持原樣；更早版本保存在 [backup/v0.50](backup/v0.50/README.md)。之前的 Fast 舞步候選素材保存在本機 `preview/guga-moonwalk/`。
+V0.57 新增「小組配對」：小組名單與個人名單分開保存，支援指定每對幾組或總配對數、配對總覽與逐對揭曉，以及 CSV／Excel 匯入。每列代表一個現有小組；配對時保留整列資料，結果可選擇顯示欄位，CSV 匯出保留所有欄位。當小組數不能整除時，配對數會調整以避免單獨一組。Chrome V0.55 套件維持原樣。
+
+咕嘎動畫自 V0.56 起使用選定舞步：1000 × 925 像素、150 張影格、約 12 秒透明循環。側欄與右側資訊卡播放 `icons/guga-pal-web-v056.webp`，並提供與使用者提供檔案位元相同的 `icons/guga-pal-web-v056.gif` 下載。更早版本保存在 [backup/v0.50](backup/v0.50/README.md)。之前的 Fast 舞步候選素材保存在本機 `preview/guga-moonwalk/`。
 
 Chrome 上架文案、商店圖片與隱私欄位說明在 [V0.55 Chrome release](release/v0.55/chrome/STORE-LISTING.md)。舊 Chrome 版保留在 `release/v0.50/chrome/`。

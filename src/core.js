@@ -19,6 +19,21 @@ export function makeGroups(items,method,number){
   shuffle(items).forEach((item,i)=>groups[i%count].push(item));
   return groups;
 }
+export function planTeamMatches(total,method,number){
+  if(total<2)return {count:0,sizes:[]};
+  const requested=Math.max(1,Math.floor(Number(number)||1));
+  // Every match needs at least two existing teams. An odd remainder joins a match.
+  const count=Math.min(Math.floor(total/2),method==='size'?Math.ceil(total/Math.max(2,requested)):requested);
+  const sizes=Array.from({length:count},(_,i)=>Math.floor(total/count)+(i<total%count?1:0));
+  return {count,sizes};
+}
+export function makeTeamMatches(items,method,number){
+  const {count}=planTeamMatches(items.length,method,number);
+  if(!count)return [];
+  const matches=Array.from({length:count},()=>[]);
+  shuffle(items).forEach((item,i)=>matches[i%count].push(item));
+  return matches;
+}
 export function parseDelimited(text,delimiter=','){
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++){
