@@ -14,33 +14,39 @@ Suggested Store names: **RandoPal - 隨機抽選與互動活動** (Traditional C
 
 > 15 random activities for classes and teams: pick, order, group, match, bingo, and ladder. Import CSV or Excel rosters.
 
-## Detailed description
+## Detailed description (saved in the Store draft)
 
 **繁體中文**
 
-> RandoPal 是課堂、活動與團隊的隨機好夥伴。匯入 CSV 或 Excel 名單，或直接貼上資料，就能在六種情境分類中選擇 15 種玩法。
+> RandoPal 是陪伴課堂、會議與團隊活動的隨機好夥伴。開啟 Chrome 擴充功能，匯入名單或卡片，就能抽人、排順序、分組、配對與安排交流，不需註冊帳號。咕嘎企鵝會陪你一起揭曉結果。
 >
-> • 快速抽選：隨機抽選、任務盲盒。抽人可使用跑馬燈、幸運轉盤或翻牌。
-> • 安排流程：隨機排序、智慧分組、角色輪盤、爬格子一對一配對。
-> • 小組交流：小組配對、互評巡迴。
+> 六類、15 種玩法：
+> • 快速暖場：隨機抽選（跑馬燈、幸運轉盤、翻牌）、任務盲盒。
+> • 安排流程：隨機排序、智慧分組、角色輪盤、爬格子。
+> • 團隊交流：小組配對、互評巡迴。
 > • 卡片創意：創意混搭、驚喜事件卡、話題賓果。
 > • 公平輪換：換桌交流、公平輪值。
 > • 空間與競賽：座位冒險、單淘汰擂台賽。
 >
-> 支援多欄名單、表頭選擇與結果顯示欄位設定。各玩法可查看操作說明、複製或匯出結果，並用投影模式在大螢幕呈現。可選擇在本機記住各玩法進度，或清除單一玩法重新開始。名單、進度與偏好只保存在目前瀏覽器，不需帳號。
+> 可匯入 CSV、TXT 或 Excel（.xlsx），也能直接貼上名單。支援有表頭或無表頭的多欄資料，並自行選擇結果要顯示哪些欄位。多種玩法可複製或匯出結果；投影模式方便現場展示，音效也可以開關。
+>
+> 你可以選擇在本機記住遊戲進度，之後回來繼續；也能單獨清除某個玩法重新開始。名單、進度與偏好保存在目前的 Chrome 瀏覽器，不會自動跨裝置同步。使用者自行決定何時顯示、複製或匯出結果。
 
 **English**
 
-> RandoPal makes random activities easy for classrooms, events, and teams. Import CSV or Excel rosters, or paste your own data, then choose from 15 activities in six categories.
+> RandoPal is a playful random activity companion for classrooms, meetings, and teams. Open the Chrome extension, import a roster or card deck, and choose people, set orders, make groups, and pair teams. Guga the penguin adds fun to each reveal. No account is needed.
 >
-> • Quick moments: Random Pick and Challenge Draw. Pick names with a slot machine, lucky wheel, or flip cards.
+> 15 activities across six categories:
+> • Quick moments: Random Pick with a slot machine, lucky wheel, or flip cards; Challenge Draw.
 > • Plan the flow: Random Order, Smart Groups, Role Shuffle, and Ladder Match.
 > • Team exchange: Team Matching and Review Circuit.
 > • Card creativity: Idea Mixer, Twist Cards, and Conversation Bingo.
 > • Fair rotation: Mixer Rounds and Fair Turn.
 > • Spaces and contests: Seat Shuffle and Bracket Builder.
 >
-> Keep multiple fields per roster row, choose whether the first row is a header, and select which fields appear in results. View activity instructions, copy or export results, and use presentation mode for a shared screen. Optionally remember progress locally or reset one activity at a time. Rosters, progress, and preferences stay in this browser; no account is needed.
+> Paste a list or import CSV, TXT, or Excel (.xlsx) files. Choose whether the first row is a header, keep multiple fields per row, and decide which fields appear in results. Many activities let you copy or export results. Use presentation mode for a shared screen, and turn sound on or off.
+>
+> Optionally remember activity progress in this browser so you can continue later, or clear one activity to start fresh. Rosters, results, progress, and preferences stay in the current Chrome browser and do not automatically sync across devices. You control when results are presented, copied, or exported.
 
 ## Privacy practices text
 
