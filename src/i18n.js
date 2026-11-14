@@ -202,6 +202,75 @@ Object.assign(dynamicChinese,{
   twistRemaining:'剩餘事件卡',twistUsed:'已抽出 {count} 張事件卡',twistHint:'本輪還剩 {left} 張事件卡。',twistEmpty:'事件卡已抽完，請重設本輪。',twistReady:'準備迎接驚喜',twistReadyHint:'抽出一個新條件，繼續挑戰！',twistPal:'咕嘎帶來一張驚喜事件卡！',twistFile:'驚喜事件卡',
   bingoMarked:'已標記格數',bingoCardCount:'這張卡有 {count} 個話題',bingoNeed:'需要 {count} 張話題卡；目前卡庫有 {available} 張。',bingoReady:'選好尺寸後產生賓果卡',bingoProgress:'已標記 {marked} / {total} 格 · 完成 {lines} 條線',bingoPal:'咕嘎準備好話題賓果卡！',bingoFile:'話題賓果',bingoRowColumn:'列',bingoColColumn:'欄',bingoMarkedColumn:'已標記',yes:'是',no:'否'
 });
+Object.assign(staticEnglish,{
+  'RandoPal 版本 V0.60':'RandoPal version V0.60','12 種玩法':'12 activities','玩法說明':'How to play',
+  '安排多輪換桌交流，讓參與者每輪遇見不同的人；跨批次記錄會降低重複搭檔。':'Plan table changes across rounds so people meet new partners. Past rounds help reduce repeat pairings.',
+  '每桌人數':'People per table','產生輪數':'Rounds to add','每輪都會安排全部成員，並盡量減少重複搭檔。':'Everyone joins every round, with fewer repeat partners where possible.',
+  '▦ 全部輪次':'▦ All rounds','✦ 逐輪揭曉':'✦ Reveal by round','點擊下方按鈕產生換桌路線':'Generate a table rotation below','尚未產生路線':'No route yet','揭曉下一輪':'Reveal next round','產生換桌路線 →':'Generate table rotation →','清除換桌紀錄':'Clear table history',
+  '依照過去被選中的次數，優先讓輪值較少的人或小組上場；記錄會保存在這個瀏覽器。':'Use previous pick counts to give people or teams with fewer turns priority. History stays in this browser.',
+  '輪值對象':'Select from','準備輪到誰？':'Who is next?','按下按鈕，公平選出下一位。':'Tap below to pick the next turn fairly.','先從被選次數最少的對象抽選。':'Start with the people or teams selected least often.','選出下一位 →':'Pick next turn →','清除輪值紀錄':'Clear turn history',
+  '換桌交流':'Mixer Rounds','公平輪值':'Fair Turn','跨輪換桌，讓大家盡量遇到新搭檔。':'Change tables to help everyone meet new partners.','開啟換桌交流 →':'Open Mixer Rounds →','優先選出輪值次數較少的成員。':'Give priority to people with fewer turns.','開啟公平輪值 →':'Open Fair Turn →'
+});
+Object.assign(dynamicEnglish,{
+  fairCategory:'Fair rotation',roundsActivity:'Mixer Rounds',turnActivity:'Fair Turn',roundsActivityHint:'Meet new partners each round',turnActivityHint:'Share turns more evenly',roundsTitle:'Meet new people each round',turnTitle:'Share the next turn fairly',
+  previewActivity:'Preview {name}',showActivityHelp:'How to play {name}',
+  pickHelp:'Choose a roster, then pick one person by slot machine, wheel, or cards. Turn on exclusion to avoid picking them again this round.',
+  taskHelp:'Choose or import a challenge deck. Draw one card at a time; exclude drawn cards or reset the deck for another round.',
+  orderHelp:'Choose a people roster and shuffle it into a speaking order. Show the whole list or reveal one person at a time.',
+  groupHelp:'Choose how many groups you need or how many people per group. Everyone is assigned once, with sizes kept as even as possible.',
+  roleHelp:'Choose people or teams and a role deck. Unique roles are assigned randomly; another draw tries to change the last assignments.',
+  pairHelp:'Choose an existing team roster, then set teams per match or the number of matches. Whole teams stay together, including when totals are uneven.',
+  reviewHelp:'Choose existing teams and the number of rounds. Each team reviews one other team per round, without reviewing itself or repeating a target.',
+  mixerHelp:'Choose a topic deck and a format deck. Draw a new pairing each time; the same combination will not repeat until you reset.',
+  twistHelp:'Choose an event deck and draw a surprise constraint during an activity. Cards do not repeat until you reset the round.',
+  bingoHelp:'Choose a conversation deck and 3×3, 4×4, or 5×5 size. Generate unique squares, mark completed conversations, then print or export the card.',
+  roundsHelp:'Choose a people roster, table size, and rounds to add. Each new round uses saved encounter history to reduce repeat partners; reveal rounds or clear history.',
+  turnHelp:'Choose a people or team roster and pick the next turn. Those with the fewest past turns get priority; history survives reopening and can be cleared.',
+  roundsStored:'Rounds saved',roundsCurrent:'{count} rounds in this roster',roundsPal:'Guga planned new table partners!',roundsHistory:'{count} rounds saved for this roster. New rounds use this history.',roundsReady:'Generate a table rotation below',roundsReadyShort:'No rounds generated yet',roundsProgress:'{shown} / {total} rounds revealed',rotationRound:'Round {index}',rotationTable:'Table {index} · {count} people',needRotationPeople:'Add at least two people for table rotation.',roundsReset:'Table rotation history cleared.',roundsFile:'table-rotation',rotationTableColumn:'Table',
+  turnRecorded:'Turns recorded',turnPeople:'{count} people or teams can take turns',turnPal:'It is {name}’s turn!',turnContextPal:'Guga is keeping turns fair!',turnReady:'Who is next?',turnReadyHint:'Tap below to pick the next turn fairly.',turnLast:'Turn {count} was just selected.',turnFirstHint:'Everyone starts with zero turns.',turnSummary:'{count} turns · each person has {min}–{max} picks',turnSummaryOne:'1 turn · each person has {min}–{max} picks',turnTimes:'{count} turns',turnOnce:'1 turn',needTurnTargets:'Add at least one person or team.',turnReset:'Turn history cleared.',turnFile:'fair-turns',turnCountColumn:'Times selected'
+});
+Object.assign(dynamicChinese,{
+  fairCategory:'公平輪換',roundsActivity:'換桌交流',turnActivity:'公平輪值',roundsActivityHint:'每輪遇見新搭檔',turnActivityHint:'讓輪值機會更平均',roundsTitle:'每一輪都遇見新夥伴',turnTitle:'公平選出下一位',
+  previewActivity:'預覽「{name}」玩法',showActivityHelp:'「{name}」怎麼玩',
+  pickHelp:'選一份名單，用跑馬燈、轉盤或翻牌抽出一人。開啟「抽過即排除」，本輪就不會重複抽到。',
+  taskHelp:'選擇或匯入任務卡庫，一次抽出一張挑戰卡。可排除已抽卡片，也可重設卡庫再玩一輪。',
+  orderHelp:'選一份個人名單，打散成出場順序。可以直接看完整清單，也可以逐位揭曉。',
+  groupHelp:'設定要分幾組，或每組幾人。每人只分到一組，各組人數會盡量平均。',
+  roleHelp:'選擇個人或小組，再選角色卡庫。每張角色卡只分派一次，重抽時會盡量換掉上一輪的配置。',
+  pairHelp:'使用現有小組名單，設定每對幾組或要配成幾對。原有小組不會拆散，奇數時也會平均安排。',
+  reviewHelp:'選現有小組和輪數。每組每輪評另一組，不評自己，也不重複評同一個對象。',
+  mixerHelp:'選主題與形式兩副卡庫，每次隨機組成一個新題目。同一個組合本輪不會重複，重設後可再玩。',
+  twistHelp:'選事件卡庫，在活動中途抽一個突發條件。卡片本輪不重複，抽完可重設。',
+  bingoHelp:'選話題卡庫和 3×3、4×4 或 5×5 尺寸。產生不重複的格子，聊完就標記，也可列印或匯出。',
+  roundsHelp:'選個人名單、每桌人數和新增輪數。新一輪會參考已存的交流紀錄，減少重複搭檔；可逐輪揭曉或清除紀錄。',
+  turnHelp:'選個人或小組名單，抽出下一位。被選次數最少者優先；紀錄會保留到下次開啟，也可以清除。',
+  roundsStored:'已保存輪數',roundsCurrent:'這份名單已安排 {count} 輪',roundsPal:'咕嘎安排了新搭檔！',roundsHistory:'這份名單已保存 {count} 輪；新一輪會參考這些紀錄。',roundsReady:'點擊下方按鈕產生換桌路線',roundsReadyShort:'尚未產生路線',roundsProgress:'已揭曉 {shown} / {total} 輪',rotationRound:'第 {index} 輪',rotationTable:'第 {index} 桌 · {count} 人',needRotationPeople:'請至少加入兩位成員才能換桌交流。',roundsReset:'換桌紀錄已清除',roundsFile:'換桌交流',rotationTableColumn:'桌次',
+  turnRecorded:'已記錄輪值',turnPeople:'{count} 位對象可輪值',turnPal:'這次輪到 {name}！',turnContextPal:'咕嘎陪大家公平輪值！',turnReady:'準備輪到誰？',turnReadyHint:'按下按鈕，公平選出下一位。',turnLast:'剛選出第 {count} 次輪值。',turnFirstHint:'每位對象一開始都是 0 次。',turnSummary:'已輪值 {count} 次 · 各人被選 {min}–{max} 次',turnSummaryOne:'已輪值 1 次 · 各人被選 {min}–{max} 次',turnTimes:'{count} 次',turnOnce:'1 次',needTurnTargets:'請至少加入一位成員或一組。',turnReset:'輪值紀錄已清除',turnFile:'公平輪值',turnCountColumn:'累計被選次數'
+});
+Object.assign(staticEnglish,{
+  '14 種玩法':'14 activities','座位冒險':'Seat Shuffle','提案擂台':'Bracket Builder','座位圖':'Seat map','每排顯示':'Seats per row','3 個座位':'3 seats','4 個座位':'4 seats','5 個座位':'5 seats','6 個座位':'6 seats','編輯座位圖':'Edit seat map',
+  '把個人名單隨機安排到可用座位；點選座位可暫時停用或恢復，匯入座位表的狀態欄也會生效。':'Randomly assign people to available seats. Tap seats to block or reopen them; an imported status field also applies.',
+  '點選座位可切換可用狀態；至少要有一個可用座位。':'Tap a seat to change its availability. At least one seat must be open.','隨機安排座位 →':'Shuffle seats →','重設座位狀態':'Reset seat availability',
+  '把個人或現有小組放進單淘汰對戰表；奇數參賽者自動輪空，選出勝者後會進入下一輪。':'Place people or existing teams in a single elimination bracket. An odd entrant gets a bye; choose winners to advance.',
+  '參賽對象':'Entrants','先產生對戰表，再點選每場勝者。':'Generate a bracket, then select the winner of each match.','點擊下方按鈕產生對戰表':'Generate a bracket below','產生對戰表 →':'Generate bracket →','清除對戰表':'Clear bracket',
+  '跳過停用座位，隨機安排入座。':'Skip blocked seats and randomly assign places.','開啟座位冒險 →':'Open Seat Shuffle →','產生單淘汰對戰表，逐輪選出勝者。':'Create a single elimination bracket and choose winners round by round.','開啟提案擂台 →':'Open Bracket Builder →'
+});
+Object.assign(dynamicEnglish,{
+  spaceCategory:'Spaces & contests',seatActivity:'Seat Shuffle',bracketActivity:'Bracket Builder',seatActivityHint:'Shuffle available seats',bracketActivityHint:'Build a single elimination bracket',seatTitle:'Find a new place',bracketTitle:'Let the proposals face off',
+  seatHelp:'Choose a people roster and seat map. Import seats with an optional Status field, tap seats to block or reopen them, then shuffle. If seats run out, unseated people appear below. Export keeps all fields.',
+  bracketHelp:'Choose people or existing teams, then generate a single elimination bracket. Tap each match winner to advance. Odd entrants receive a bye. You can clear the bracket and export results.',
+  demoSeats:'Sample Seat Map',seatNameColumn:'Seat',seatStatusColumn:'Status',seats:'{count} seats',seatRosterSummary:'{members} seats · {columns} fields · Showing {fields}',seatAvailableCount:'Open seats',seatPlan:'{people} people · {seats} seats',bracketRoundsCount:'Rounds',bracketParticipants:'{count} entrants',newSeatRoster:'New seat map',seatRowsLabel:'Seats',seatRowsHelp:'One seat per line, or paste a table with headers such as Seat and Status',seatRowsPlaceholder:'For example:\nA1\nA2\nA3',seatEditorCount:'{rows} seats · {columns} fields',
+  seatToggle:'{seat}: {status}. Tap to change.',seatOpen:'Available',seatClosed:'Blocked',seatUnseated:'{count} people without seats',seatEveryone:'Everyone has a seat',seatHint:'{open} open seats for {people} people. Tap seats to change availability.',seatNeed:'Add people and at least one available seat.',seatPal:'Guga has shuffled the seats!',seatReset:'Seat availability reset.',seatFile:'seat-shuffle',seatColumn:'Seat',personColumn:'Person',
+  bracketReady:'Generate a bracket below',bracketFirstHint:'Generate a bracket, then select the winner of each match.',bracketMatch:'Match {index}',bracketBye:'Bye',bracketChampion:'Champion: {name}',bracketProgress:'{completed} of {total} matches decided · {rounds} rounds shown',bracketNeed:'Add at least two entrants.',bracketPal:'Guga built the bracket!',bracketReset:'Bracket cleared.',bracketFile:'bracket',bracketMatchColumn:'Match',bracketSideColumn:'Side',bracketWonColumn:'Advanced'
+});
+Object.assign(dynamicChinese,{
+  spaceCategory:'場地競賽',seatActivity:'座位冒險',bracketActivity:'提案擂台',seatActivityHint:'跳過停用座位，隨機入座',bracketActivityHint:'一路晉級的單淘汰賽',seatTitle:'換個座位，換個驚喜',bracketTitle:'讓提案上擂台',
+  seatHelp:'選個人名單和座位圖。可匯入含「狀態」欄的座位表，點座位可停用或恢復，再隨機安排。座位不足時，未入座的人會列在下方；匯出保留完整欄位。',
+  bracketHelp:'選個人或現有小組，產生單淘汰對戰表。逐場點選勝者，即可晉級下一輪；奇數參賽者自動輪空。可清除並匯出結果。',
+  demoSeats:'示範座位圖',seatNameColumn:'座位',seatStatusColumn:'狀態',seats:'{count} 個座位',seatRosterSummary:'{members} 個座位 · {columns} 欄 · 顯示 {fields}',seatAvailableCount:'可用座位',seatPlan:'{people} 位成員 · {seats} 個座位',bracketRoundsCount:'輪次',bracketParticipants:'{count} 位參賽者',newSeatRoster:'新座位圖',seatRowsLabel:'座位清單',seatRowsHelp:'單欄每行一個座位；也可貼上含「座位」「狀態」等標題的表格',seatRowsPlaceholder:'例如：\nA1\nA2\nA3',seatEditorCount:'{rows} 個座位 · {columns} 欄',
+  seatToggle:'{seat}：{status}，點擊切換',seatOpen:'可用',seatClosed:'停用',seatUnseated:'{count} 位尚未入座',seatEveryone:'全員都已入座',seatHint:'{open} 個可用座位，{people} 位成員；點選座位可切換狀態。',seatNeed:'請加入成員和至少一個可用座位。',seatPal:'咕嘎安排好了新座位！',seatReset:'座位狀態已重設',seatFile:'座位冒險',seatColumn:'座位',personColumn:'成員',
+  bracketReady:'點擊下方按鈕產生對戰表',bracketFirstHint:'先產生對戰表，再點選每場勝者。',bracketMatch:'第 {index} 場',bracketBye:'輪空',bracketChampion:'冠軍：{name}',bracketProgress:'已決出 {completed} / {total} 場 · 顯示 {rounds} 輪',bracketNeed:'請至少加入兩位參賽者。',bracketPal:'咕嘎排好了對戰表！',bracketReset:'對戰表已清除',bracketFile:'提案擂台',bracketMatchColumn:'場次',bracketSideColumn:'序位',bracketWonColumn:'晉級'
+});
 export function translationCatalogComplete(){
   const source=Object.keys(dynamicChinese).sort();
   return LANGUAGES.every(({code})=>{

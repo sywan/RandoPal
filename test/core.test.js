@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,assignSeats,startBracket,makeBracketRound,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -60,6 +60,36 @@ test('bingo cards have unique complete grids at supported sizes',()=>{
   assert.deepEqual(makeBingoCard(prompts.slice(0,8),3),[]);
   assert.deepEqual(makeBingoCard([...prompts.slice(0,8),prompts[0]],3),[]);
   assert.deepEqual(makeBingoCard(prompts,6),[]);
+});
+test('fair turns balance selection counts and avoid an immediate repeat when tied',()=>{
+  const history=[];
+  for(let i=0;i<12;i++){const next=fairTurnIndex(3,history);assert.ok(next>=0&&next<3);if(i>0&&i%3!==0)assert.notEqual(next,history.at(-1));history.push(next)}
+  assert.deepEqual([0,1,2].map(i=>history.filter(value=>value===i).length),[4,4,4]);
+  assert.equal(fairTurnIndex(0,history),-1);
+});
+test('mixer rounds keep everyone at one table and avoid prior partners when possible',()=>{
+  const prior=[[[0,1],[2,3]]],rounds=makeMixerRounds(4,2,2,prior);
+  assert.equal(rounds.length,2);
+  for(const round of rounds){assert.deepEqual(round.map(group=>group.length),[2,2]);assert.deepEqual(round.flat().sort((a,b)=>a-b),[0,1,2,3])}
+  const pairs=[...prior,...rounds].flatMap(round=>round.map(group=>group.slice().sort((a,b)=>a-b).join(':')));
+  assert.equal(new Set(pairs).size,6);
+});
+test('seat shuffle respects availability and accounts for people without seats',()=>{
+  assert.equal(seatAvailable(['A1','不可用'],['座位','狀態']),false);
+  assert.equal(seatAvailable(['A2','可用'],['座位','狀態']),true);
+  assert.equal(seatAvailable(['B1','blocked'],['Seat','Status']),false);
+  const result=assignSeats(5,[0,2,4]);
+  assert.equal(result.assignments.length,3);
+  assert.equal(result.unseated.length,2);
+  assert.deepEqual([...result.assignments.map(item=>item.person),...result.unseated].sort((a,b)=>a-b),[0,1,2,3,4]);
+  assert.deepEqual(result.assignments.map(item=>item.seat).sort((a,b)=>a-b),[0,2,4]);
+});
+test('bracket pairs everyone once and advances odd entrants with a bye',()=>{
+  const rounds=startBracket(5);
+  assert.equal(rounds.length,1);
+  assert.deepEqual(rounds[0].flatMap(match=>[match.a,match.b].filter(value=>value!==null)).sort((a,b)=>a-b),[0,1,2,3,4]);
+  assert.equal(rounds[0].filter(match=>match.b===null&&match.winner===match.a).length,1);
+  assert.deepEqual(makeBracketRound([2,4,1]),[{a:2,b:4,winner:null},{a:1,b:null,winner:1}]);
 });
 test('CSV import handles quoted commas and a name header',()=>{
   const rows=parseCsv('姓名,組別\r\n"王,小明",A\r\n陳小華,B\r\n');

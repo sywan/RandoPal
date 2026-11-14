@@ -16,6 +16,11 @@ test('older person rosters gain a separate team roster without losing data',asyn
     assert.equal(state.rosters.find(r=>r.id===state.selectedRoleId).kind,'role');
     for(const id of ['demo-topics','demo-formats','demo-twists','demo-bingo'])assert.equal(state.rosters.find(r=>r.id===id).kind,'task');
     assert.equal(state.creativeDecks.bingo,'demo-bingo');
+    assert.deepEqual(state.rotationHistory,{});
+    assert.equal(state.rosters.find(r=>r.id===state.selectedSeatId).kind,'seat');
+    assert.deepEqual(state.seatOverrides,{});
+    assert.deepEqual(state.seatSessions,{});
+    assert.deepEqual(state.bracketSessions,{});
     assert.equal(state.soundEnabled,true);
   }finally{delete globalThis.localStorage}
 });

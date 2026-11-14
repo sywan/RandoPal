@@ -66,6 +66,50 @@ export function makeBingoCard(rows,size){
   if(![3,4,5].includes(count)||unique.length<count*count)return [];
   return shuffle(unique).slice(0,count*count);
 }
+export function fairTurnIndex(total,history=[]){
+  if(!Number.isSafeInteger(total)||total<1)return -1;
+  const counts=Array(total).fill(0);
+  for(const index of history)if(Number.isInteger(index)&&index>=0&&index<total)counts[index]++;
+  const fewest=Math.min(...counts),last=history.at(-1);
+  let choices=counts.flatMap((count,i)=>count===fewest?[i]:[]);
+  if(choices.length>1)choices=choices.filter(i=>i!==last);
+  return choices[randomInt(choices.length)];
+}
+export function makeMixerRounds(total,requestedSize,requestedRounds,priorRounds=[]){
+  if(!Number.isSafeInteger(total)||total<2)return [];
+  const size=Math.max(2,Math.min(total,Math.floor(Number(requestedSize)||2)));
+  const count=Math.min(10,Math.max(1,Math.floor(Number(requestedRounds)||1)));
+  const tableCount=Math.ceil(total/size),history=[...priorRounds],result=[];
+  const pairs=groups=>groups.flatMap(group=>group.flatMap((a,i)=>group.slice(i+1).map(b=>a<b?`${a}:${b}`:`${b}:${a}`)));
+  const occurrences=new Map();for(const round of history)for(const pair of pairs(round))occurrences.set(pair,(occurrences.get(pair)||0)+1);
+  for(let round=0;round<count;round++){
+    let best=null,bestScore=Infinity;const previous=new Set(pairs(history.at(-1)||[]));
+    for(let attempt=0;attempt<120;attempt++){
+      const groups=Array.from({length:tableCount},()=>[]);
+      shuffle(Array.from({length:total},(_,i)=>i)).forEach((person,i)=>groups[i%tableCount].push(person));
+      const score=pairs(groups).reduce((sum,pair)=>sum+(occurrences.get(pair)||0)*4+(previous.has(pair)?3:0),0);
+      if(score<bestScore){best=groups;bestScore=score}if(score===0)break;
+    }
+    result.push(best);history.push(best);for(const pair of pairs(best))occurrences.set(pair,(occurrences.get(pair)||0)+1);
+  }
+  return result;
+}
+export function seatAvailable(row,columns){
+  const index=columns.findIndex(name=>/^(狀態|可用|availability|available|status)$/i.test(String(name).trim()));
+  if(index<0)return true;
+  const value=String(row[index]??'').trim().toLowerCase();
+  return !/^(不可用|停用|封閉|否|無|0|no|false|blocked|unavailable|closed|disabled)$/i.test(value);
+}
+export function assignSeats(personCount,availableIndices){
+  const people=shuffle(Array.from({length:personCount},(_,i)=>i)),seats=shuffle(availableIndices);
+  return {assignments:people.slice(0,seats.length).map((person,i)=>({person,seat:seats[i]})),unseated:people.slice(seats.length)};
+}
+export function makeBracketRound(entrants){
+  const matches=[];
+  for(let i=0;i<entrants.length;i+=2)matches.push({a:entrants[i],b:entrants[i+1]??null,winner:entrants[i+1]===undefined?entrants[i]:null});
+  return matches;
+}
+export function startBracket(total){return total<2?[]:[makeBracketRound(shuffle(Array.from({length:total},(_,i)=>i)))]}
 export function parseDelimited(text,delimiter=','){
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++){
