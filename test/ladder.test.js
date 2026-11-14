@@ -14,7 +14,7 @@ test('adjacent rungs cannot collide and each path has one unique endpoint',()=>{
   assert.equal(traceLadder(1,[{level:2,gap:1}],8,session.levels).end,2);
   assert.equal(traceLadder(2,[{level:2,gap:1}],8,session.levels).end,1);
 });
-test('automatic rungs preserve legal topology and final resource shuffle is a permutation',()=>{
+test('automatic rungs preserve legal topology and locking keeps resource positions',()=>{
   let session=makeLadderSession(6);
   for(let i=0;i<60;i++)session.rungs=addRandomRung(session.rungs,session.count,session.levels);
   for(const rung of session.rungs){
@@ -23,7 +23,8 @@ test('automatic rungs preserve legal topology and final resource shuffle is a pe
   }
   const locked=lockLadder(session);
   assert.equal(locked.locked,true);
-  assert.deepEqual(locked.resourceOrder.slice().sort((a,b)=>a-b),[0,1,2,3,4,5]);
+  assert.deepEqual(locked.resourceOrder,[0,1,2,3,4,5]);
+  assert.deepEqual(locked.rungs,session.rungs);
   assert.throws(()=>makeLadderSession(LADDER_MAX_LANES+1),RangeError);
 });
 test('every supported ladder size keeps a one-to-one assignment after random rungs',()=>{

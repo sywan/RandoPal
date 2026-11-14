@@ -1,4 +1,4 @@
-import {randomInt,shuffle} from './core.js';
+import {randomInt} from './core.js';
 
 export const LADDER_MAX_LANES=24;
 export function ladderLevels(count){return Math.min(26,Math.max(12,Math.ceil(count*1.3)))}
@@ -31,4 +31,4 @@ export function makeLadderSession(count){
   if(!Number.isSafeInteger(count)||count<2||count>LADDER_MAX_LANES)throw new RangeError('invalid ladder size');
   return {count,levels:ladderLevels(count),rungs:[],resourceOrder:Array.from({length:count},(_,i)=>i),locked:false,revealed:[],focused:null};
 }
-export function lockLadder(session){return {...session,locked:true,resourceOrder:shuffle(session.resourceOrder),revealed:[],focused:null}}
+export function lockLadder(session){return {...session,locked:true,revealed:[],focused:null}}
