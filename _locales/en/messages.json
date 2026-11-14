@@ -1,8 +1,8 @@
 {
   "appName": {
-    "message": "RandoPal - Random Pick, Order & Groups"
+    "message": "RandoPal - Random Activities & Picker"
   },
   "appDescription": {
-    "message": "Import CSV or Excel rosters, pick names with a wheel or cards, shuffle presentation order, and make balanced groups."
+    "message": "15 random activities for classes and teams: pick, order, group, match, bingo, and ladder. Import CSV or Excel rosters."
   }
 }

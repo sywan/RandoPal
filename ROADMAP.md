@@ -2,9 +2,9 @@
 
 ## 目前已完成 / Available now
 
-網頁版 V0.64 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome 擴充功能維持 V0.55。
+網頁版 V0.64 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome V0.64 套件已備妥，等待商店審核與發布。
 
-The V0.64 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome extension remains V0.55.
+The V0.64 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome V0.64 package is ready for Store review and publication.
 
 | 分類 / Category | 玩法 / Activities |
 | --- | --- |
@@ -27,6 +27,6 @@ V0.63 將爬格子移入「安排流程」，並把「場地競賽」更名為�
 
 V0.63 moves Ladder Match to Plan the flow and renames the Spaces and contests category in Chinese. Bracket Builder now draws every round and connector up front, with immediate advancement and visible byes.
 
-V0.64 增加所有玩法的本機進度記憶、頂端記住進度開關、各玩法清除進度與右側資訊欄收合。名單與遊戲進度分開保存；Chrome 擴充功能仍為 V0.55。
+V0.64 增加所有玩法的本機進度記憶、頂端記住進度開關、各玩法清除進度與右側資訊欄收合。名單與遊戲進度分開保存；Chrome 擴充功能 V0.64 套件已建立。
 
-V0.64 adds local activity progress, a remember-progress switch, per-activity reset, and a collapsible right context panel. Rosters remain saved separately. Chrome stays at V0.55.
+V0.64 adds local activity progress, a remember-progress switch, per-activity reset, and a collapsible right context panel. Rosters remain saved separately. A Chrome V0.64 package is ready.
