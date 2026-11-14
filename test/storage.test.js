@@ -18,9 +18,11 @@ test('older person rosters gain a separate team roster without losing data',asyn
     assert.equal(state.creativeDecks.bingo,'demo-bingo');
     assert.deepEqual(state.rotationHistory,{});
     assert.equal(state.rosters.find(r=>r.id===state.selectedSeatId).kind,'seat');
+    assert.equal(state.rosters.find(r=>r.id===state.selectedResourceId).kind,'resource');
     assert.deepEqual(state.seatOverrides,{});
     assert.deepEqual(state.seatSessions,{});
     assert.deepEqual(state.bracketSessions,{});
+    assert.deepEqual(state.ladderSessions,{});
     assert.equal(state.soundEnabled,true);
   }finally{delete globalThis.localStorage}
 });

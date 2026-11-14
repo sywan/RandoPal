@@ -8,8 +8,9 @@ export const initialState={rosters:[
   {id:'demo-formats',kind:'task',name:'創意形式卡',columns:['形式'],rows:['一分鐘提案','四格漫畫','無字海報','角色扮演','三句故事','簡短辯論','紙上原型','新聞標題','訪談問題','電梯簡報'].map(value=>[value]),displayColumns:[0],picked:[]},
   {id:'demo-twists',kind:'task',name:'驚喜事件卡',columns:['事件'],rows:['時間突然只剩一半','預算被砍掉三成','需要讓新手也能參與','加入一位不同立場的觀眾','必須用一張圖說明','合作對象突然改變','只能使用身邊的材料','加入一項環保限制','要在戶外完成','換一位成員擔任主講'].map(value=>[value]),displayColumns:[0],picked:[]},
   {id:'demo-bingo',kind:'task',name:'話題賓果卡',columns:['話題'],rows:['最近學到的新事物','最想去的地方','一道喜歡的食物','一個擅長的技能','最喜歡的季節','最近看過的作品','想嘗試的運動','童年的遊戲','一件值得感謝的事','喜歡的音樂','最近解決的難題','想學的語言','最有趣的課程','合作成功的經驗','一個小目標','喜歡的動物','最棒的團隊活動','最想發明的東西','一項日常習慣','喜歡的節日','最想交換的技能','最近的驚喜','一個好問題','最常用的工具','今天的心情'].map(value=>[value]),displayColumns:[0],picked:[]},
-  {id:'demo-seats',kind:'seat',name:'示範座位圖',columns:['座位','狀態'],rows:Array.from({length:12},(_,i)=>[`${String.fromCharCode(65+Math.floor(i/4))}${i%4+1}`,[3,10].includes(i)?'不可用':'可用']),displayColumns:[0],picked:[]}
-],selectedId:'demo',selectedTeamId:'demo-teams',selectedTaskId:'demo-tasks',selectedNormalTaskId:'demo-tasks',selectedRoleId:'demo-roles',selectedSeatId:'demo-seats',creativeDecks:{topic:'demo-topics',format:'demo-formats',twist:'demo-twists',bingo:'demo-bingo'},rotationHistory:{},seatOverrides:{},seatSessions:{},bracketSessions:{},soundEnabled:false};
+  {id:'demo-seats',kind:'seat',name:'示範座位圖',columns:['座位','狀態'],rows:Array.from({length:12},(_,i)=>[`${String.fromCharCode(65+Math.floor(i/4))}${i%4+1}`,[3,10].includes(i)?'不可用':'可用']),displayColumns:[0],picked:[]},
+  {id:'demo-resources',kind:'resource',name:'示範資源',columns:['資源'],rows:Array.from({length:8},(_,i)=>[`資源 ${String.fromCharCode(65+i)}`]),displayColumns:[0],picked:[]}
+],selectedId:'demo',selectedTeamId:'demo-teams',selectedTaskId:'demo-tasks',selectedNormalTaskId:'demo-tasks',selectedRoleId:'demo-roles',selectedSeatId:'demo-seats',selectedResourceId:'demo-resources',creativeDecks:{topic:'demo-topics',format:'demo-formats',twist:'demo-twists',bingo:'demo-bingo'},rotationHistory:{},seatOverrides:{},seatSessions:{},bracketSessions:{},ladderSessions:{},soundEnabled:false};
 const hasChromeStorage=typeof chrome!=='undefined'&&Boolean(chrome.storage?.local);
 export async function loadState(){
   try{
@@ -18,13 +19,13 @@ export async function loadState(){
     if(data&&Array.isArray(data.rosters)&&data.rosters.length){
       for(const roster of data.rosters){
         if(!Array.isArray(roster.rows)){roster.rows=(roster.names||[]).map(name=>[name]);roster.columns=['姓名'];roster.displayColumns=[0];delete roster.names}
-        roster.kind=['team','task','role','seat'].includes(roster.kind)?roster.kind:'person';
+        roster.kind=['team','task','role','seat','resource'].includes(roster.kind)?roster.kind:'person';
         if(!Array.isArray(roster.displayColumns)||!roster.displayColumns.length)roster.displayColumns=[0];
         if(!Array.isArray(roster.picked))roster.picked=[];
       }
       for(const sample of initialState.rosters)if(!data.rosters.some(roster=>roster.kind===sample.kind||roster.id===sample.id))data.rosters.push(structuredClone(sample));
       for(const sample of initialState.rosters.filter(roster=>['demo-topics','demo-formats','demo-twists','demo-bingo'].includes(roster.id)))if(!data.rosters.some(roster=>roster.id===sample.id))data.rosters.push(structuredClone(sample));
-      for(const [kind,key] of [['person','selectedId'],['team','selectedTeamId'],['task','selectedTaskId'],['role','selectedRoleId'],['seat','selectedSeatId']]){
+      for(const [kind,key] of [['person','selectedId'],['team','selectedTeamId'],['task','selectedTaskId'],['role','selectedRoleId'],['seat','selectedSeatId'],['resource','selectedResourceId']]){
         if(!data.rosters.some(roster=>roster.kind===kind&&roster.id===data[key]))data[key]=data.rosters.find(roster=>roster.kind===kind).id;
       }
       if(!data.rosters.some(roster=>roster.kind==='task'&&roster.id===data.selectedNormalTaskId))data.selectedNormalTaskId=data.selectedTaskId;
@@ -34,6 +35,7 @@ export async function loadState(){
       if(!data.seatOverrides||typeof data.seatOverrides!=='object'||Array.isArray(data.seatOverrides))data.seatOverrides={};
       if(!data.seatSessions||typeof data.seatSessions!=='object'||Array.isArray(data.seatSessions))data.seatSessions={};
       if(!data.bracketSessions||typeof data.bracketSessions!=='object'||Array.isArray(data.bracketSessions))data.bracketSessions={};
+      if(!data.ladderSessions||typeof data.ladderSessions!=='object'||Array.isArray(data.ladderSessions))data.ladderSessions={};
       return data;
     }
   }catch(error){console.warn('Could not load saved data',error)}

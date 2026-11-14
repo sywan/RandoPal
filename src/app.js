@@ -1,13 +1,14 @@
 import {randomInt,shuffle,parseNames,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,assignSeats,startBracket,makeBracketRound,parseCsv,parseDelimited,makeRecordSet,serializeTsv,formatRecord} from './core.js';
 import {initialState,loadState,saveState} from './storage.js';
 import {namesFromXlsx} from './xlsx.js';
-import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=11';
+import {LADDER_MAX_LANES,makeLadderSession,toggleRung,addRandomRung,traceLadder,lockLadder} from './ladder.js';
+import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=12';
 
 const $=id=>document.getElementById(id);
-const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',pairDisplay:'grid',reviewDisplay:'grid',roundsDisplay:'grid',roleTargetKind:'person',turnTargetKind:'person',bracketTargetKind:'team',orderRevealIndex:0,groupRevealIndex:0,pairRevealIndex:0,reviewRevealIndex:0,roundsRevealIndex:0,groupMethod:'count',pairMethod:'size',order:[],groups:[],pairings:[],taskDraws:[],rolesAssigned:[],previousRoles:[],reviewRounds:[],roundsResult:[],turnWinnerIndex:null,mixerPairs:[],twistIndices:[],bingoRows:[],bingoMarks:new Set(),running:false,editingNew:false,editorSelection:new Set([0]),editorColumnsSignature:'',editorSingleColumnName:'姓名',importTable:null,lastWinner:null};
-const categories=[{id:'quick',key:'quickCategory',modes:['pick','task']},{id:'plan',key:'planCategory',modes:['order','group','role']},{id:'exchange',key:'exchangeCategory',modes:['pair','review']},{id:'creative',key:'creativeCategory',modes:['mixer','twist','bingo']},{id:'fair',key:'fairCategory',modes:['rounds','turn']},{id:'space',key:'spaceCategory',modes:['seat','bracket']}];
-const activityMeta={pick:['✧','pickActivity','pickActivityHint','LUCKY PICK','pickTitle'],task:['▣','taskActivity','taskActivityHint','CHALLENGE DRAW','taskTitle'],order:['☷','orderActivity','orderActivityHint','RANDOM ORDER','orderTitle'],group:['♧','groupActivity','groupActivityHint','TEAM MAKER','groupTitle'],role:['✿','roleActivity','roleActivityHint','ROLE SHUFFLE','roleTitle'],pair:['⇄','pairActivity','pairActivityHint','TEAM MATCH','pairTitle'],review:['⟳','reviewActivity','reviewActivityHint','REVIEW CIRCUIT','reviewTitle'],mixer:['✣','mixerActivity','mixerActivityHint','IDEA MIXER','mixerTitle'],twist:['⚡','twistActivity','twistActivityHint','TWIST CARDS','twistTitleMain'],bingo:['▦','bingoActivity','bingoActivityHint','CONVERSATION BINGO','bingoTitle'],rounds:['↝','roundsActivity','roundsActivityHint','MIXER ROUNDS','roundsTitle'],turn:['◎','turnActivity','turnActivityHint','FAIR TURN','turnTitle'],seat:['▤','seatActivity','seatActivityHint','SEAT SHUFFLE','seatTitle'],bracket:['♜','bracketActivity','bracketActivityHint','BRACKET BUILDER','bracketTitle']};
-const selectedKey={person:'selectedId',team:'selectedTeamId',task:'selectedTaskId',role:'selectedRoleId',seat:'selectedSeatId'};
+const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',pairDisplay:'grid',reviewDisplay:'grid',roundsDisplay:'grid',roleTargetKind:'person',turnTargetKind:'person',bracketTargetKind:'team',ladderTargetKind:'person',orderRevealIndex:0,groupRevealIndex:0,pairRevealIndex:0,reviewRevealIndex:0,roundsRevealIndex:0,groupMethod:'count',pairMethod:'size',order:[],groups:[],pairings:[],taskDraws:[],rolesAssigned:[],previousRoles:[],reviewRounds:[],roundsResult:[],turnWinnerIndex:null,mixerPairs:[],twistIndices:[],bingoRows:[],bingoMarks:new Set(),running:false,editingNew:false,editorSelection:new Set([0]),editorColumnsSignature:'',editorSingleColumnName:'姓名',importTable:null,lastWinner:null};
+const categories=[{id:'quick',key:'quickCategory',modes:['pick','task']},{id:'plan',key:'planCategory',modes:['order','group','role']},{id:'exchange',key:'exchangeCategory',modes:['pair','review']},{id:'creative',key:'creativeCategory',modes:['mixer','twist','bingo']},{id:'fair',key:'fairCategory',modes:['rounds','turn']},{id:'space',key:'spaceCategory',modes:['seat','bracket','ladder']}];
+const activityMeta={pick:['✧','pickActivity','pickActivityHint','LUCKY PICK','pickTitle'],task:['▣','taskActivity','taskActivityHint','CHALLENGE DRAW','taskTitle'],order:['☷','orderActivity','orderActivityHint','RANDOM ORDER','orderTitle'],group:['♧','groupActivity','groupActivityHint','TEAM MAKER','groupTitle'],role:['✿','roleActivity','roleActivityHint','ROLE SHUFFLE','roleTitle'],pair:['⇄','pairActivity','pairActivityHint','TEAM MATCH','pairTitle'],review:['⟳','reviewActivity','reviewActivityHint','REVIEW CIRCUIT','reviewTitle'],mixer:['✣','mixerActivity','mixerActivityHint','IDEA MIXER','mixerTitle'],twist:['⚡','twistActivity','twistActivityHint','TWIST CARDS','twistTitleMain'],bingo:['▦','bingoActivity','bingoActivityHint','CONVERSATION BINGO','bingoTitle'],rounds:['↝','roundsActivity','roundsActivityHint','MIXER ROUNDS','roundsTitle'],turn:['◎','turnActivity','turnActivityHint','FAIR TURN','turnTitle'],seat:['▤','seatActivity','seatActivityHint','SEAT SHUFFLE','seatTitle'],bracket:['♜','bracketActivity','bracketActivityHint','BRACKET BUILDER','bracketTitle'],ladder:['╳','ladderActivity','ladderActivityHint','LADDER MATCH','ladderTitle']};
+const selectedKey={person:'selectedId',team:'selectedTeamId',task:'selectedTaskId',role:'selectedRoleId',seat:'selectedSeatId',resource:'selectedResourceId'};
 let toastTimer;
 let audioContext;
 const reducedMotion=matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -26,7 +27,7 @@ function tone(frequency,duration=.07,delay=0,volume=.035){
 function successSound(){tone(523,.12,0);tone(659,.12,.12);tone(784,.2,.24)}
 function shuffleSound(){tone(392,.06,0);tone(494,.06,.07);tone(587,.07,.14)}
 function renderSound(){const on=Boolean(state.data.soundEnabled);$('soundToggle').setAttribute('aria-pressed',String(on));$('soundToggle').title=t(on?'turnOffSound':'turnOnSound');$('soundToggle').querySelector('span').textContent=t(on?'soundOn':'soundOff')}
-const currentKind=()=>['task','mixer','twist','bingo'].includes(state.mode)?'task':state.mode==='pair'||state.mode==='review'?'team':state.mode==='role'?state.roleTargetKind:state.mode==='turn'?state.turnTargetKind:state.mode==='bracket'?state.bracketTargetKind:'person';
+const currentKind=()=>['task','mixer','twist','bingo'].includes(state.mode)?'task':state.mode==='pair'||state.mode==='review'?'team':state.mode==='role'?state.roleTargetKind:state.mode==='turn'?state.turnTargetKind:state.mode==='bracket'?state.bracketTargetKind:state.mode==='ladder'?state.ladderTargetKind:'person';
 const rosterForKind=kind=>state.data.rosters.find(r=>r.kind===kind&&r.id===state.data[selectedKey[kind]])||state.data.rosters.find(r=>r.kind===kind);
 const roster=()=>rosterForKind(currentKind());
 const rotationFor=r=>{const all=state.data.rotationHistory;const saved=all[r.id];if(!saved||!Array.isArray(saved.turns)||!Array.isArray(saved.mixer))all[r.id]={turns:[],mixer:[]};return all[r.id]};
@@ -34,6 +35,8 @@ const seatOverrides=r=>state.data.seatOverrides[r.id]??={};
 const seatOpen=(r,i)=>Object.hasOwn(seatOverrides(r),i)?seatOverrides(r)[i]:seatAvailable(r.rows[i],r.columns);
 const seatSession=(people=rosterForKind('person'),seats=rosterForKind('seat'))=>state.data.seatSessions[people.id]?.[seats.id];
 const bracketFor=r=>Array.isArray(state.data.bracketSessions[r.id])?state.data.bracketSessions[r.id]:[];
+const ladderKey=()=>`${rosterForKind(state.ladderTargetKind).id}:${rosterForKind('resource').id}`;
+const ladderFor=()=>state.data.ladderSessions[ladderKey()];
 const creativeSlot=mode=>({mixer:'topic',twist:'twist',bingo:'bingo'})[mode];
 const creativeDeck=slot=>state.data.rosters.find(r=>r.kind==='task'&&r.id===state.data.creativeDecks[slot])||rosterForKind('task');
 function renderCreativeDeckChoices(){
@@ -54,17 +57,18 @@ function localizedRow(row,r){
   if(r.id==='demo-teams'&&row[1]===`第 ${row[0]} 組`)return [row[0],t('sampleTeamName',{index:row[0]}),...row.slice(2)];
   if(r.id==='demo-tasks'){const index=r.rows.indexOf(row);if(JSON.stringify(row)===JSON.stringify(initialState.rosters[2].rows[index]))return demoTasksEnglish[index]||row}
   if(r.id==='demo-roles'){const index=r.rows.indexOf(row);if(JSON.stringify(row)===JSON.stringify(initialState.rosters[3].rows[index]))return [demoRolesEnglish[index],...row.slice(1)]}
+  if(r.id==='demo-resources'){const index=r.rows.indexOf(row),sample=initialState.rosters.find(item=>item.id===r.id);if(index>=0&&JSON.stringify(row)===JSON.stringify(sample?.rows[index]))return [`Resource ${String.fromCharCode(65+index)}`,...row.slice(1)]}
   if(demoCreativeEnglish[r.id]){const index=r.rows.indexOf(row),sample=initialState.rosters.find(item=>item.id===r.id);if(index>=0&&JSON.stringify(row)===JSON.stringify(sample?.rows[index]))return [demoCreativeEnglish[r.id][index],...row.slice(1)]}
   return row;
 }
 const label=(row,r=roster())=>formatRecord(localizedRow(row,r),r.columns,r.displayColumns);
 const creativeRows=slot=>{const deck=creativeDeck(slot);return [...new Map(deck.rows.map(row=>[label(row,deck),row])).values()]};
 const bingoPool=()=>creativeRows('bingo');
-const sampleNameKeys={demo:'demoRoster','demo-teams':'demoTeamRoster','demo-tasks':'demoTaskRoster','demo-roles':'demoRoleRoster','demo-topics':'demoTopics','demo-formats':'demoFormats','demo-twists':'demoTwists','demo-bingo':'demoBingo','demo-seats':'demoSeats'};
+const sampleNameKeys={demo:'demoRoster','demo-teams':'demoTeamRoster','demo-tasks':'demoTaskRoster','demo-roles':'demoRoleRoster','demo-topics':'demoTopics','demo-formats':'demoFormats','demo-twists':'demoTwists','demo-bingo':'demoBingo','demo-seats':'demoSeats','demo-resources':'demoResources'};
 const rosterName=r=>sampleNameKeys[r.id]&&r.name===initialState.rosters.find(item=>item.id===r.id)?.name?t(sampleNameKeys[r.id]):r.name;
-const columnName=(name,r)=>r?.id==='demo'&&name==='姓名'?t('memberName'):r?.id==='demo-teams'&&name==='組別編號'?t('teamIdColumn'):r?.id==='demo-teams'&&name==='組名'?t('teamNameColumn'):r?.id==='demo-tasks'&&name==='任務'?t('taskColumn'):r?.id==='demo-tasks'&&name==='提示'?t('taskHintColumn'):r?.id==='demo-roles'&&name==='角色'?t('roleColumn'):r?.id==='demo-topics'&&name==='主題'?t('topicColumn'):r?.id==='demo-formats'&&name==='形式'?t('formatColumn'):r?.id==='demo-twists'&&name==='事件'?t('eventColumn'):r?.id==='demo-bingo'&&name==='話題'?t('promptColumn'):r?.id==='demo-seats'&&name==='座位'?t('seatColumn'):r?.id==='demo-seats'&&name==='狀態'?t('seatStatusColumn'):name;
+const columnName=(name,r)=>r?.id==='demo'&&name==='姓名'?t('memberName'):r?.id==='demo-teams'&&name==='組別編號'?t('teamIdColumn'):r?.id==='demo-teams'&&name==='組名'?t('teamNameColumn'):r?.id==='demo-tasks'&&name==='任務'?t('taskColumn'):r?.id==='demo-tasks'&&name==='提示'?t('taskHintColumn'):r?.id==='demo-roles'&&name==='角色'?t('roleColumn'):r?.id==='demo-topics'&&name==='主題'?t('topicColumn'):r?.id==='demo-formats'&&name==='形式'?t('formatColumn'):r?.id==='demo-twists'&&name==='事件'?t('eventColumn'):r?.id==='demo-bingo'&&name==='話題'?t('promptColumn'):r?.id==='demo-seats'&&name==='座位'?t('seatColumn'):r?.id==='demo-seats'&&name==='狀態'?t('seatStatusColumn'):r?.id==='demo-resources'&&name==='資源'?t('resourceColumn'):name;
 const defaultDisplay=(columns,kind='person')=>{
-  if(kind==='seat')return [0];
+  if(kind==='seat'||kind==='resource')return [0];
   if(kind==='team'){
     const id=columns.findIndex(name=>/^(組別編號|組號|小組編號|team number|group number|team id|group id)$/i.test(name));
     const name=columns.findIndex(value=>/^(組名|小組名稱|隊名|team name|group name|name)$/i.test(value));
@@ -107,8 +111,8 @@ function renderRosterStudio(){
     const card=document.createElement('article');card.className='studio-card';
     const heading=document.createElement('div');heading.className='studio-card-head';
     const title=document.createElement('h3');title.textContent=rosterName(r);
-    const badge=document.createElement('span');badge.textContent=r.id===roster().id?t('activeRoster'):t(({person:'members',team:'teams',task:'tasks',role:'roles',seat:'seats'})[r.kind],{count:r.rows.length});heading.append(title,badge);
-    const summary=document.createElement('p');summary.textContent=t(({person:'rosterSummary',team:'teamRosterSummary',task:'taskRosterSummary',role:'roleRosterSummary',seat:'seatRosterSummary'})[r.kind],{members:r.rows.length,columns:r.columns.length,fields:r.displayColumns.map(i=>columnName(r.columns[i],r)).join(getLanguage()==='en'?', ':'、')});
+    const badge=document.createElement('span');badge.textContent=r.id===roster().id?t('activeRoster'):t(({person:'members',team:'teams',task:'tasks',role:'roles',seat:'seats',resource:'resources'})[r.kind],{count:r.rows.length});heading.append(title,badge);
+    const summary=document.createElement('p');summary.textContent=t(({person:'rosterSummary',team:'teamRosterSummary',task:'taskRosterSummary',role:'roleRosterSummary',seat:'seatRosterSummary',resource:'resourceRosterSummary'})[r.kind],{members:r.rows.length,columns:r.columns.length,fields:r.displayColumns.map(i=>columnName(r.columns[i],r)).join(getLanguage()==='en'?', ':'、')});
     const actions=document.createElement('div');actions.className='studio-card-actions';
     const use=document.createElement('button');use.type='button';use.className='primary-button';use.textContent=t('useInPlayground');use.addEventListener('click',()=>{selectRoster(r.id);showPage('playground')});
     const edit=document.createElement('button');edit.type='button';edit.className='secondary-button';edit.textContent=t('editRoster');edit.addEventListener('click',()=>{if(rosterForKind(r.kind).id!==r.id)selectRoster(r.id);openEditor(false,r.kind)});
@@ -124,16 +128,16 @@ function showPage(page){
   document.querySelector('.content').scrollTo({top:0});closeSidebarDrawer();
 }
 function applyPreset(preset){
-  const options={warmup:['pick','slot'],wheel:['pick','wheel'],cards:['pick','cards'],present:['order','reveal'],teams:['group','reveal'],peer:['pair','reveal'],challenge:['task',null],roles:['role',null],circuit:['review','reveal'],mixer:['mixer',null],twist:['twist',null],bingo:['bingo',null],rounds:['rounds',null],turn:['turn',null],seat:['seat',null],bracket:['bracket',null]};
+  const options={warmup:['pick','slot'],wheel:['pick','wheel'],cards:['pick','cards'],present:['order','reveal'],teams:['group','reveal'],peer:['pair','reveal'],challenge:['task',null],roles:['role',null],circuit:['review','reveal'],mixer:['mixer',null],twist:['twist',null],bingo:['bingo',null],rounds:['rounds',null],turn:['turn',null],seat:['seat',null],bracket:['bracket',null],ladder:['ladder',null]};
   const [mode,display]=options[preset];showPage('playground');setMode(mode);
   if(mode==='pick')setDisplay(display);else if(mode==='order')setOrderDisplay(display);else if(mode==='group')setGroupDisplay(display);else if(mode==='pair')setPairDisplay(display);else if(mode==='review')setReviewDisplay(display);
-  palSays(t(({warmup:'warmupPal',wheel:'wheelPal',cards:'cardsPal',present:'presentPal',teams:'teamsPal',peer:'peerPal',challenge:'challengePal',roles:'rolesPal',circuit:'circuitPal',mixer:'mixerPal',twist:'twistPal',bingo:'bingoPal',rounds:'roundsPal',turn:'turnReadyHint',seat:'seatPal',bracket:'bracketPal'})[preset]));
+  palSays(t(({warmup:'warmupPal',wheel:'wheelPal',cards:'cardsPal',present:'presentPal',teams:'teamsPal',peer:'peerPal',challenge:'challengePal',roles:'rolesPal',circuit:'circuitPal',mixer:'mixerPal',twist:'twistPal',bingo:'bingoPal',rounds:'roundsPal',turn:'turnReadyHint',seat:'seatPal',bracket:'bracketPal',ladder:'ladderPal'})[preset]));
 }
 function renderContext(){
   const r=roster(),count=r.rows.length;
   ['pick','order','group','pair'].forEach(mode=>$(mode+'Context').classList.toggle('hidden',state.mode!==mode));
-  $('extraContext').classList.toggle('hidden',!['task','role','review','mixer','twist','bingo','rounds','turn','seat','bracket'].includes(state.mode));
-  const titles={pick:['✧',uiText('抽選進度')],order:['☷',t('orderProgressTitle')],group:['♧',t('groupPlan')],pair:['⇄',t('pairPlan')],task:['▣',t('taskPlan')],role:['✿',t('rolePlan')],review:['⟳',t('reviewPlan')],mixer:['✣',t('mixerActivity')],twist:['⚡',t('twistActivity')],bingo:['▦',t('bingoActivity')],rounds:['↝',t('roundsActivity')],turn:['◎',t('turnActivity')],seat:['▤',t('seatActivity')],bracket:['♜',t('bracketActivity')]};
+  $('extraContext').classList.toggle('hidden',!['task','role','review','mixer','twist','bingo','rounds','turn','seat','bracket','ladder'].includes(state.mode));
+  const titles={pick:['✧',uiText('抽選進度')],order:['☷',t('orderProgressTitle')],group:['♧',t('groupPlan')],pair:['⇄',t('pairPlan')],task:['▣',t('taskPlan')],role:['✿',t('rolePlan')],review:['⟳',t('reviewPlan')],mixer:['✣',t('mixerActivity')],twist:['⚡',t('twistActivity')],bingo:['▦',t('bingoActivity')],rounds:['↝',t('roundsActivity')],turn:['◎',t('turnActivity')],seat:['▤',t('seatActivity')],bracket:['♜',t('bracketActivity')],ladder:['╳',t('ladderActivity')]};
   setText('contextIcon',titles[state.mode][0]);setText('contextTitle',titles[state.mode][1]);
   setText('orderContextNumber',state.order.length||count);
   setText('orderContextDetail',state.order.length?t('orderProgressDetail',{count:state.order.length,progress:state.orderDisplay==='reveal'?t('orderRevealed',{count:state.orderRevealIndex}):t('fullListReady')}):(uiText('產生順序後，這裡會顯示完成進度。')));
@@ -175,22 +179,25 @@ function renderContext(){
     const seats=rosterForKind('seat'),open=seats.rows.filter((_,i)=>seatOpen(seats,i)).length;setText('extraContextNumber',open);setText('extraContextCaption',t('seatAvailableCount'));setText('extraContextDetail',t('seatPlan',{people:count,seats:seats.rows.length}));
   }else if(state.mode==='bracket'){
     const rounds=bracketFor(r);setText('extraContextNumber',rounds.length);setText('extraContextCaption',t('bracketRoundsCount'));setText('extraContextDetail',t('bracketParticipants',{count:r.rows.length}));
+  }else if(state.mode==='ladder'){
+    const session=ladderFor(),rungs=session?.rungs.length||0;setText('extraContextNumber',session?.revealed.length||0);setText('extraContextCaption',t('ladderRevealedCount'));setText('extraContextDetail',t(rungs===1?'ladderContextOne':'ladderContext',{count:r.rows.length,rungs}));
   }
-  setText('contextPalText',({pick:uiText('咕嘎陪你抽出幸運兒！'),order:t('orderPal'),group:t('groupPal'),pair:t('pairPal'),task:t('taskPal'),role:t('rolePal'),review:t('reviewPal'),mixer:t('mixerPal'),twist:t('twistPal'),bingo:t('bingoPal'),rounds:t('roundsPal'),turn:t('turnContextPal'),seat:t('seatPal'),bracket:t('bracketPal')})[state.mode]);
+  setText('contextPalText',({pick:uiText('咕嘎陪你抽出幸運兒！'),order:t('orderPal'),group:t('groupPal'),pair:t('pairPal'),task:t('taskPal'),role:t('rolePal'),review:t('reviewPal'),mixer:t('mixerPal'),twist:t('twistPal'),bingo:t('bingoPal'),rounds:t('roundsPal'),turn:t('turnContextPal'),seat:t('seatPal'),bracket:t('bracketPal'),ladder:t('ladderPal')})[state.mode]);
 }
 function renderRosterChoices(){
   const selected=roster();
   $('rosterSelect').replaceChildren(...state.data.rosters.filter(r=>r.kind===currentKind()).map(r=>{const o=document.createElement('option');o.value=r.id;o.textContent=rosterName(r);return o}));
   $('rosterSelect').value=selected.id;
-  $('rosterList').replaceChildren(...state.data.rosters.filter(r=>!['demo-topics','demo-formats','demo-twists','demo-bingo','demo-seats'].includes(r.id)||r.id===selected.id||state.mode==='seat'&&r.id===state.data.selectedSeatId).map(r=>{const b=document.createElement('button');b.type='button';b.className='roster-item'+(r.id===selected.id?' active':'');b.textContent=({person:'',team:'⇄ ',task:'▣ ',role:'✿ ',seat:'▤ '})[r.kind]+rosterName(r);b.addEventListener('click',()=>selectRoster(r.id));return b}));
+  $('rosterList').replaceChildren(...state.data.rosters.filter(r=>!['demo-topics','demo-formats','demo-twists','demo-bingo','demo-seats','demo-resources'].includes(r.id)||r.id===selected.id||state.mode==='seat'&&r.id===state.data.selectedSeatId||state.mode==='ladder'&&r.id===state.data.selectedResourceId).map(r=>{const b=document.createElement('button');b.type='button';b.className='roster-item'+(r.id===selected.id?' active':'');b.textContent=({person:'',team:'⇄ ',task:'▣ ',role:'✿ ',seat:'▤ ',resource:'╳ '})[r.kind]+rosterName(r);b.addEventListener('click',()=>selectRoster(r.id));return b}));
   $('roleDeckSelect').replaceChildren(...state.data.rosters.filter(r=>r.kind==='role').map(r=>{const option=document.createElement('option');option.value=r.id;option.textContent=rosterName(r);return option}));
   $('roleDeckSelect').value=rosterForKind('role').id;$('roleTargetKind').value=state.roleTargetKind;$('turnTargetKind').value=state.turnTargetKind;
   $('seatRosterSelect').replaceChildren(...state.data.rosters.filter(r=>r.kind==='seat').map(r=>{const option=document.createElement('option');option.value=r.id;option.textContent=rosterName(r);return option}));$('seatRosterSelect').value=rosterForKind('seat').id;$('bracketTargetKind').value=state.bracketTargetKind;
+  $('ladderResourceSelect').replaceChildren(...state.data.rosters.filter(r=>r.kind==='resource').map(r=>{const option=document.createElement('option');option.value=r.id;option.textContent=rosterName(r);return option}));$('ladderResourceSelect').value=rosterForKind('resource').id;$('ladderTargetKind').value=state.ladderTargetKind;
   renderCreativeDeckChoices();
 }
 function renderStats(){
   const r=roster(),remaining=r.rows.filter((_,i)=>!r.picked.includes(i));
-  setText('rosterNameLabel',rosterName(r));setText('totalCount',r.rows.length);setText('remainingCount',remaining.length);setText('pickedCount',t(r.picked.length===1?'person':'people',{count:r.picked.length}));setText('countPill',t(({person:'members',team:'teams',task:'tasks',role:'roles'})[r.kind],{count:r.rows.length}));
+  setText('rosterNameLabel',rosterName(r));setText('totalCount',r.rows.length);setText('remainingCount',remaining.length);setText('pickedCount',t(r.picked.length===1?'person':'people',{count:r.picked.length}));setText('countPill',t(({person:'members',team:'teams',task:'tasks',role:'roles',resource:'resources'})[r.kind],{count:r.rows.length}));
   const pickedRows=r.picked.map(i=>r.rows[i]).filter(Boolean).map(row=>label(row,r));
   const chips=(document.body.classList.contains('stage-view')?pickedRows:pickedRows.slice(-9)).reverse();
   $('pickedList').replaceChildren(...(chips.length?chips.map(name=>{const s=document.createElement('span');s.textContent=name;return s}):[(()=>{const s=document.createElement('span');s.className='empty-chip';s.textContent=t('noPick');return s})()]));
@@ -209,7 +216,7 @@ function renderStats(){
   updatePairHint();
   if(state.display!=='wheel')drawWheel();
 }
-function render(){renderRosterChoices();renderStats();renderRosterStudio();renderActivityBrowser();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();renderRoundsResult();renderTurnResult();renderSeatBoard();renderBracketResult();drawWheel();renderSound()}
+function render(){renderRosterChoices();renderStats();renderRosterStudio();renderActivityBrowser();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();renderRoundsResult();renderTurnResult();renderSeatBoard();renderBracketResult();renderLadder();drawWheel();renderSound()}
 function renderLanguageSwitch(){
   $('languageSwitch').dataset.language=getLanguage();
   document.querySelectorAll('.language-option').forEach(button=>{
@@ -223,7 +230,7 @@ function renderLocalized(){
   if(state.order.length)renderOrderResult();else setText('orderResult',uiText('點擊下方按鈕產生順序'));
   if(state.groups.length)renderGroupResult();else setText('groupResult',uiText('點擊下方按鈕產生分組'));
   if(state.pairings.length)renderPairResult();else setText('pairResult',uiText('點擊下方按鈕產生配對'));
-  renderOrderReveal();renderGroupReveal();renderPairReveal();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();renderRoundsResult();renderTurnResult();renderSeatBoard();renderBracketResult();
+  renderOrderReveal();renderGroupReveal();renderPairReveal();renderTaskResult();renderRoleResult();renderReviewResult();renderMixerResult();renderTwistResult();renderBingoResult();renderRoundsResult();renderTurnResult();renderSeatBoard();renderBracketResult();renderLadder();
   if(state.lastWinner){setText('slotName',state.lastWinner);setText('stageSub',t('pickedSub',{name:state.lastWinner}));setText('pickNote',t('pickedNote',{name:state.lastWinner}));setText('pickBtn',t('pickAgain'));setText('palMessage',t('pickedPal',{name:state.lastWinner}))}
   else{setText('slotName',uiText('點擊開始抽選'));setText('stageSub',uiText('每個人都有一樣的機會'));setText('pickBtn',uiText('開始抽選')+' →');setText('palMessage',uiText('嗨！選個玩法，我陪你一起玩。'))}
   if($('rosterDialog').open){updateEditorCount();renderEditorKind()}updateProjectionButton();
@@ -248,6 +255,8 @@ function selectRoster(id){
   else if(state.mode==='role'&&['person','team'].includes(selected.kind)){state.roleTargetKind=selected.kind;setMode('role')}
   else if(state.mode==='turn'&&['person','team'].includes(selected.kind)){state.turnTargetKind=selected.kind;setMode('turn')}
   else if(state.mode==='bracket'&&['person','team'].includes(selected.kind)){state.bracketTargetKind=selected.kind;setMode('bracket')}
+  else if(state.mode==='ladder'&&['person','team'].includes(selected.kind)){state.ladderTargetKind=selected.kind;setMode('ladder')}
+  else if(selected.kind==='resource')setMode('ladder');
   else if(selected.kind!==currentKind())setMode(({person:'group',team:'pair',task:'task'})[selected.kind]);
   clearResults();persist();render();closeSidebarDrawer();
 }
@@ -502,6 +511,41 @@ function renderBracketResult(){
   $('copyBracket').disabled=!rounds.length;$('exportBracket').disabled=!rounds.length;
 }
 function generateBracket(){const r=rosterForKind(state.bracketTargetKind);if(r.rows.length<2){notify(t('bracketNeed'));return}state.data.bracketSessions[r.id]=startBracket(r.rows.length);persist();shuffleSound();renderBracketResult();renderContext();palSays(t('bracketPal'))}
+function ladderReady(){const target=rosterForKind(state.ladderTargetKind),resources=rosterForKind('resource');return target.rows.length>=2&&target.rows.length===resources.rows.length&&target.rows.length<=LADDER_MAX_LANES}
+function ladderHint(){const target=rosterForKind(state.ladderTargetKind),resources=rosterForKind('resource'),session=ladderFor();
+  if(target.rows.length!==resources.rows.length)return t('ladderMismatch',{targets:target.rows.length,resources:resources.rows.length});
+  if(target.rows.length<2)return t('ladderNeedTwo');
+  if(target.rows.length>LADDER_MAX_LANES)return t('ladderTooMany',{max:LADDER_MAX_LANES,count:target.rows.length});
+  if(!session)return t('ladderStartHint');
+  if(session.locked&&session.revealed.length===session.count)return t('ladderAllDone');
+  return session.locked?t('ladderLockedHint',{done:session.revealed.length,total:session.count}):t(session.rungs.length===1?'ladderDrawHintOne':'ladderDrawHint',{rungs:session.rungs.length});
+}
+function ladderMatchRows(){const session=ladderFor();if(!session)return [];const target=rosterForKind(state.ladderTargetKind),resources=rosterForKind('resource');return session.revealed.map(start=>{const end=traceLadder(start,session.rungs,session.count,session.levels).end;return {start,end,target:target.rows[start],resource:resources.rows[session.resourceOrder[end]]}})}
+function renderLadder(){
+  const target=rosterForKind(state.ladderTargetKind),resources=rosterForKind('resource'),session=ladderFor(),board=$('ladderBoard');setText('ladderHint',ladderHint());
+  $('ladderNew').disabled=!ladderReady()||!!session;$('ladderReset').disabled=!session;$('ladderAddOne').disabled=!session||session.locked;$('ladderAddFive').disabled=!session||session.locked;$('ladderUndo').disabled=!session||session.locked||!session.rungs.length;$('ladderLock').disabled=!session||session.locked||!session.rungs.length;$('ladderRevealAll').disabled=!session?.locked||session.revealed.length===session.count;$('copyLadder').disabled=!session?.revealed.length;$('exportLadder').disabled=!session?.revealed.length;
+  if(!session){board.className='ladder-board empty-result';setText('ladderBoard',t('ladderEmpty'));$('ladderResults').replaceChildren();return}
+  board.className='ladder-board'+(session.locked?' locked':'');
+  const width=Math.max(560,session.count*82),height=Math.max(340,session.levels*29),ns='http://www.w3.org/2000/svg',x=lane=>(lane+.5)*width/session.count,y=level=>level*height/(session.levels+1);
+  const previousScroll=board.querySelector('.ladder-scroll')?.scrollLeft||0,scroller=document.createElement('div');scroller.className='ladder-scroll';const frame=document.createElement('div');frame.className='ladder-frame';frame.style.width=`${width}px`;
+  const top=document.createElement('div');top.className='ladder-labels ladder-top';top.style.gridTemplateColumns=`repeat(${session.count},minmax(0,1fr))`;
+  top.replaceChildren(...target.rows.map((row,i)=>{const button=document.createElement('button');button.type='button';button.className='ladder-person'+(session.revealed.includes(i)?' revealed':'')+(session.focused===i?' focused':'');button.textContent=label(row,target);button.disabled=!session.locked;button.setAttribute('aria-pressed',String(session.focused===i));button.title=session.locked?t('ladderTraceTitle',{name:label(row,target)}):t('ladderBeforeLock');button.addEventListener('click',()=>revealLadder(i));return button}));
+  const track=document.createElement('div');track.className='ladder-track';track.style.height=`${height}px`;const svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox',`0 0 ${width} ${height}`);svg.setAttribute('aria-hidden','true');
+  for(let i=0;i<session.count;i++){const line=document.createElementNS(ns,'line');line.setAttribute('x1',x(i));line.setAttribute('x2',x(i));line.setAttribute('y1','0');line.setAttribute('y2',height);line.setAttribute('class','ladder-rail');svg.append(line)}
+  for(const rung of session.rungs){const line=document.createElementNS(ns,'line');line.setAttribute('x1',x(rung.gap));line.setAttribute('x2',x(rung.gap+1));line.setAttribute('y1',y(rung.level+1));line.setAttribute('y2',y(rung.level+1));line.setAttribute('class','ladder-rung');svg.append(line)}
+  const routes=session.revealed.filter(start=>start!==session.focused);if(session.revealed.includes(session.focused))routes.push(session.focused);
+  for(const start of routes){const route=traceLadder(start,session.rungs,session.count,session.levels);const path=document.createElementNS(ns,'path');path.setAttribute('d',route.points.map(([lane,level],index)=>`${index?'L':'M'} ${x(lane)} ${y(level)}`).join(' '));path.setAttribute('class','ladder-trace'+(session.focused===start?' focused fresh':' overview'));path.setAttribute('stroke',`hsl(${(start*59+198)%360} 76% 43%)`);path.setAttribute('pathLength','100');svg.append(path)}track.append(svg);
+  if(!session.locked)for(let level=0;level<session.levels;level++)for(let gap=0;gap<session.count-1;gap++){
+    const chosen=session.rungs.some(rung=>rung.level===level&&rung.gap===gap),slot=document.createElement('button');slot.type='button';slot.className='ladder-slot'+(chosen?' chosen':'');slot.style.left=`${(gap+1)*100/session.count}%`;slot.style.top=`${(level+1)*100/(session.levels+1)}%`;slot.style.width=`${100/session.count}%`;slot.textContent=chosen?'−':'+';slot.setAttribute('aria-label',t(chosen?'ladderRemoveRung':'ladderAddRung',{level:level+1,gap:gap+1,next:gap+2}));slot.addEventListener('click',()=>{const next=toggleRung(session.rungs,level,gap,session.count,session.levels);if(next===session.rungs){notify(t('ladderCollision'));return}session.rungs=next;persist();tone(chosen?392:587,.07);renderLadder();renderContext()});track.append(slot)
+  }
+  const endOfRevealed=new Set(session.revealed.map(start=>traceLadder(start,session.rungs,session.count,session.levels).end));const bottom=document.createElement('div');bottom.className='ladder-labels ladder-bottom';bottom.style.gridTemplateColumns=`repeat(${session.count},minmax(0,1fr))`;
+  bottom.replaceChildren(...session.resourceOrder.map((resourceIndex,i)=>{const item=document.createElement('button');item.type='button';item.disabled=!session.locked;item.textContent=session.locked&&!endOfRevealed.has(i)?'？':label(resources.rows[resourceIndex],resources);item.className=session.locked&&!endOfRevealed.has(i)?'concealed':'';item.setAttribute('aria-label',session.locked?t('ladderTraceUp',{index:i+1}):t('ladderBeforeLock'));item.addEventListener('click',()=>{const start=Array.from({length:session.count},(_,index)=>index).find(index=>traceLadder(index,session.rungs,session.count,session.levels).end===i);if(start!==undefined)revealLadder(start)});return item}));frame.append(top,track,bottom);scroller.append(frame);board.replaceChildren(scroller);scroller.scrollLeft=previousScroll;
+  $('ladderResults').replaceChildren(...ladderMatchRows().map(item=>{const card=document.createElement('div');card.className='ladder-result-card'+(session.focused===item.start?' focused':'');const left=document.createElement('b');left.textContent=label(item.target,target);const arrow=document.createElement('span');arrow.textContent='→';const right=document.createElement('strong');right.textContent=label(item.resource,resources);card.append(left,arrow,right);return card}));
+}
+function revealLadder(start){const session=ladderFor();if(!session?.locked)return;const fresh=!session.revealed.includes(start);if(fresh)session.revealed.push(start);session.focused=start;persist();tone(659,.13);renderLadder();renderContext();if(fresh&&session.revealed.length===session.count)successSound()}
+function createLadder(){if(!ladderReady()){notify(ladderHint());return}state.data.ladderSessions[ladderKey()]=makeLadderSession(rosterForKind(state.ladderTargetKind).rows.length);persist();renderLadder();renderContext();palSays(t('ladderPal'))}
+function randomLadderRungs(amount){const session=ladderFor();if(!session||session.locked)return;let added=0;for(let i=0;i<amount;i++){const next=addRandomRung(session.rungs,session.count,session.levels);if(next===session.rungs)break;session.rungs=next;added++}if(!added){notify(t('ladderFull'));return}persist();shuffleSound();renderLadder();renderContext()}
+function lockCurrentLadder(){const session=ladderFor();if(!session||session.locked||!session.rungs.length)return;state.data.ladderSessions[ladderKey()]=lockLadder(session);persist();shuffleSound();renderLadder();renderContext();palSays(t('ladderLockedPal'))}
 function downloadCsv(filename,columns,rows){
   const safe=value=>{let text=String(value??'');if(/^[=+@-]/.test(text))text="'"+text;return '"'+text.replaceAll('"','""')+'"'};
   const csv='\uFEFF'+[columns,...rows].map(row=>row.map(safe).join(',')).join('\r\n');
@@ -509,7 +553,7 @@ function downloadCsv(filename,columns,rows){
 }
 async function copy(text){try{await navigator.clipboard.writeText(text);notify(t('copySuccess'))}catch{notify(t('copyError'))}}
 function editorData(){
-  const text=$('rosterText').value.trim();if(!text)return {columns:[t(({person:'nameColumn',team:'teamNameColumn',task:'taskColumn',role:'roleColumn',seat:'seatNameColumn'})[$('rosterKind').value])],rows:[]};
+  const text=$('rosterText').value.trim();if(!text)return {columns:[t(({person:'nameColumn',team:'teamNameColumn',task:'taskColumn',role:'roleColumn',seat:'seatNameColumn',resource:'resourceColumn'})[$('rosterKind').value])],rows:[]};
   if(text.includes('\t'))return makeRecordSet(parseDelimited(text,'\t'),true,getLanguage());
   if(['task','role'].includes($('rosterKind').value))return {columns:[state.editorSingleColumnName],rows:text.split(/\r?\n/).map(value=>[value.trim()]).filter(row=>row[0])};
   const lines=text.split(/\r?\n/).filter(Boolean);
@@ -522,27 +566,27 @@ function renderFieldChoices(columns){
 }
 function renderEditorKind(){
   const kind=$('rosterKind').value;
-  setText('rosterRowsLabel',t(({person:'personRowsLabel',team:'teamRowsLabel',task:'taskRowsLabel',role:'roleRowsLabel',seat:'seatRowsLabel'})[kind]));
-  setText('rosterRowsHelp',t(({person:'personRowsHelp',team:'teamRowsHelp',task:'taskRowsHelp',role:'roleRowsHelp',seat:'seatRowsHelp'})[kind]));
-  $('rosterText').placeholder=t(({person:'personRowsPlaceholder',team:'teamRowsPlaceholder',task:'taskRowsPlaceholder',role:'roleRowsPlaceholder',seat:'seatRowsPlaceholder'})[kind]);
+  setText('rosterRowsLabel',t(({person:'personRowsLabel',team:'teamRowsLabel',task:'taskRowsLabel',role:'roleRowsLabel',seat:'seatRowsLabel',resource:'resourceRowsLabel'})[kind]));
+  setText('rosterRowsHelp',t(({person:'personRowsHelp',team:'teamRowsHelp',task:'taskRowsHelp',role:'roleRowsHelp',seat:'seatRowsHelp',resource:'resourceRowsHelp'})[kind]));
+  $('rosterText').placeholder=t(({person:'personRowsPlaceholder',team:'teamRowsPlaceholder',task:'taskRowsPlaceholder',role:'roleRowsPlaceholder',seat:'seatRowsPlaceholder',resource:'resourceRowsPlaceholder'})[kind]);
 }
 function openEditor(isNew=false,kind=currentKind()){
-  if(state.running)return;state.editingNew=isNew;const r=rosterForKind(kind);$('rosterKind').value=kind;$('rosterKind').disabled=!isNew;$('rosterNameInput').value=isNew?t(({person:'newRoster',team:'newTeamRoster',task:'newTaskRoster',role:'newRoleRoster',seat:'newSeatRoster'})[kind]):r.name;
+  if(state.running)return;state.editingNew=isNew;const r=rosterForKind(kind);$('rosterKind').value=kind;$('rosterKind').disabled=!isNew;$('rosterNameInput').value=isNew?t(({person:'newRoster',team:'newTeamRoster',task:'newTaskRoster',role:'newRoleRoster',seat:'newSeatRoster',resource:'newResourceRoster'})[kind]):r.name;
   $('rosterText').value=isNew?'':r.columns.length===1?r.rows.map(row=>row[0]).join('\n'):serializeTsv(r.columns,r.rows);
-  state.editorSelection=new Set(isNew?[0]:r.displayColumns);state.editorSingleColumnName=isNew?t(({person:'nameColumn',team:'teamNameColumn',task:'taskColumn',role:'roleColumn',seat:'seatNameColumn'})[kind]):r.columns[0];state.editorColumnsSignature=JSON.stringify(isNew?[state.editorSingleColumnName]:r.columns);state.importTable=null;$('firstRowHeader').checked=true;$('firstRowHeader').disabled=false;
+  state.editorSelection=new Set(isNew?[0]:r.displayColumns);state.editorSingleColumnName=isNew?t(({person:'nameColumn',team:'teamNameColumn',task:'taskColumn',role:'roleColumn',seat:'seatNameColumn',resource:'resourceColumn'})[kind]):r.columns[0];state.editorColumnsSignature=JSON.stringify(isNew?[state.editorSingleColumnName]:r.columns);state.importTable=null;$('firstRowHeader').checked=true;$('firstRowHeader').disabled=false;
   $('deleteRoster').hidden=isNew||state.data.rosters.filter(item=>item.kind===r.kind).length===1;renderEditorKind();updateEditorCount();$('rosterDialog').showModal();
 }
-function updateEditorCount(){const data=editorData(),signature=JSON.stringify(data.columns);if(signature!==state.editorColumnsSignature){state.editorSelection=new Set(defaultDisplay(data.columns,$('rosterKind').value));state.editorColumnsSignature=signature}setText('editorCount',t(({person:'editorCount',team:'editorTeamCount',task:'taskEditorCount',role:'roleEditorCount',seat:'seatEditorCount'})[$('rosterKind').value],{rows:data.rows.length,columns:data.columns.length}));renderFieldChoices(data.columns)}
+function updateEditorCount(){const data=editorData(),signature=JSON.stringify(data.columns);if(signature!==state.editorColumnsSignature){state.editorSelection=new Set(defaultDisplay(data.columns,$('rosterKind').value));state.editorColumnsSignature=signature}setText('editorCount',t(({person:'editorCount',team:'editorTeamCount',task:'taskEditorCount',role:'roleEditorCount',seat:'seatEditorCount',resource:'resourceEditorCount'})[$('rosterKind').value],{rows:data.rows.length,columns:data.columns.length}));renderFieldChoices(data.columns)}
 function saveEditor(event){
   event.preventDefault();const name=$('rosterNameInput').value.trim(),data=editorData();
   if(!name){notify(t('enterRosterName'));return}if(!data.rows.length){notify(t('needRow'));return}
   const displayColumns=[...state.editorSelection].filter(i=>i<data.columns.length).sort((a,b)=>a-b);
   if(!displayColumns.length){notify(t('needDisplayColumn'));return}
-  if(state.editingNew){const id=crypto.randomUUID(),kind=$('rosterKind').value;state.data.rosters.push({id,kind,name,...data,displayColumns,picked:[]});state.data[selectedKey[kind]]=id;const slot=kind==='task'?creativeSlot(state.mode):null;if(slot)state.data.creativeDecks[slot]=id;else if(kind==='task')state.data.selectedNormalTaskId=id;const activeMode=state.mode==='rounds'&&kind==='person'||state.mode==='turn'&&['person','team'].includes(kind)||state.mode==='seat'&&['person','seat'].includes(kind)||state.mode==='bracket'&&['person','team'].includes(kind);if(state.mode==='turn'&&activeMode)state.turnTargetKind=kind;if(state.mode==='bracket'&&activeMode)state.bracketTargetKind=kind;setMode(slot||activeMode?state.mode:({person:'group',team:'pair',task:'task',role:'role',seat:'seat'})[kind])}
+  if(state.editingNew){const id=crypto.randomUUID(),kind=$('rosterKind').value;state.data.rosters.push({id,kind,name,...data,displayColumns,picked:[]});state.data[selectedKey[kind]]=id;const slot=kind==='task'?creativeSlot(state.mode):null;if(slot)state.data.creativeDecks[slot]=id;else if(kind==='task')state.data.selectedNormalTaskId=id;const activeMode=state.mode==='rounds'&&kind==='person'||state.mode==='turn'&&['person','team'].includes(kind)||state.mode==='seat'&&['person','seat'].includes(kind)||state.mode==='bracket'&&['person','team'].includes(kind)||state.mode==='ladder'&&['person','team','resource'].includes(kind);if(state.mode==='turn'&&activeMode)state.turnTargetKind=kind;if(state.mode==='bracket'&&activeMode)state.bracketTargetKind=kind;if(state.mode==='ladder'&&['person','team'].includes(kind))state.ladderTargetKind=kind;setMode(slot||activeMode?state.mode:({person:'group',team:'pair',task:'task',role:'role',seat:'seat',resource:'ladder'})[kind])}
   else{const r=rosterForKind($('rosterKind').value);Object.assign(r,{name,...data,displayColumns,picked:[]});clearRelatedSessions(r)}
   persist();clearResults();render();$('rosterDialog').close();notify(t('rosterSaved'));
 }
-function clearRelatedSessions(r){delete state.data.rotationHistory[r.id];delete state.data.bracketSessions[r.id];if(r.kind==='seat'){delete state.data.seatOverrides[r.id];clearSeatSessions(r.id)}if(r.kind==='person')delete state.data.seatSessions[r.id]}
+function clearRelatedSessions(r){delete state.data.rotationHistory[r.id];delete state.data.bracketSessions[r.id];for(const key of Object.keys(state.data.ladderSessions))if(key.split(':').includes(r.id))delete state.data.ladderSessions[key];if(r.kind==='seat'){delete state.data.seatOverrides[r.id];clearSeatSessions(r.id)}if(r.kind==='person')delete state.data.seatSessions[r.id]}
 function deleteRoster(){const selected=rosterForKind($('rosterKind').value);if(state.data.rosters.filter(r=>r.kind===selected.kind).length===1)return;state.data.rosters=state.data.rosters.filter(r=>r.id!==selected.id);clearRelatedSessions(selected);state.data[selectedKey[selected.kind]]=state.data.rosters.find(r=>r.kind===selected.kind).id;if(selected.kind==='task'){if(state.data.selectedNormalTaskId===selected.id)state.data.selectedNormalTaskId=state.data.selectedTaskId;for(const slot of Object.keys(state.data.creativeDecks))if(state.data.creativeDecks[slot]===selected.id)state.data.creativeDecks[slot]=state.data.selectedTaskId}persist();clearResults();render();$('rosterDialog').close();notify(t('rosterDeleted'))}
 async function importFile(file){
   if(!file)return;
@@ -614,7 +658,7 @@ function bind(){
   document.querySelectorAll('[data-pair-method]').forEach(b=>b.addEventListener('click',()=>updatePairMethod(b.dataset.pairMethod)));
   $('rosterSelect').addEventListener('change',e=>selectRoster(e.target.value));$('addRoster').addEventListener('click',()=>openEditor(true));['editRoster','editRosterAside'].forEach(id=>$(id).addEventListener('click',()=>openEditor()));$('rosterForm').addEventListener('submit',saveEditor);$('rosterText').addEventListener('input',updateEditorCount);$('closeDialog').addEventListener('click',()=>$('rosterDialog').close());$('cancelDialog').addEventListener('click',()=>$('rosterDialog').close());$('deleteRoster').addEventListener('click',deleteRoster);$('importButton').addEventListener('click',()=>$('importFile').click());$('importFile').addEventListener('change',e=>importFile(e.target.files[0]));
   $('firstRowHeader').addEventListener('change',applyImportPreview);
-  $('rosterKind').addEventListener('change',()=>{state.editorSingleColumnName=t(({person:'nameColumn',team:'teamNameColumn',task:'taskColumn',role:'roleColumn',seat:'seatNameColumn'})[$('rosterKind').value]);state.editorColumnsSignature='';renderEditorKind();updateEditorCount()});
+  $('rosterKind').addEventListener('change',()=>{state.editorSingleColumnName=t(({person:'nameColumn',team:'teamNameColumn',task:'taskColumn',role:'roleColumn',seat:'seatNameColumn',resource:'resourceColumn'})[$('rosterKind').value]);state.editorColumnsSignature='';renderEditorKind();updateEditorCount()});
   $('pickBtn').addEventListener('click',()=>pick());$('excludePicked').addEventListener('change',drawWheel);$('resetPool').addEventListener('click',()=>{if(state.running)return;roster().picked=[];persist();renderStats();notify(t('resetDone'))});$('orderBtn').addEventListener('click',generateOrder);$('groupBtn').addEventListener('click',generateGroups);$('groupNumber').addEventListener('input',updateGroupHint);
   $('pairBtn').addEventListener('click',generatePairings);$('pairNumber').addEventListener('input',()=>{clearPairings();updatePairHint()});
   $('taskBtn').addEventListener('click',drawTask);$('taskNoRepeat').addEventListener('change',renderStats);$('resetTasks').addEventListener('click',()=>{const r=rosterForKind('task');r.picked=[];state.taskDraws=[];persist();renderTaskResult();renderStats();notify(t('taskReset'))});
@@ -625,6 +669,8 @@ function bind(){
   $('turnBtn').addEventListener('click',generateTurn);$('turnTargetKind').addEventListener('change',event=>{state.turnTargetKind=event.target.value;clearResults();setMode('turn');renderTurnResult()});$('resetTurn').addEventListener('click',()=>{rotationFor(rosterForKind(state.turnTargetKind)).turns=[];persist();renderTurnResult();renderContext();notify(t('turnReset'))});
   $('seatBtn').addEventListener('click',generateSeats);$('seatRosterSelect').addEventListener('change',event=>{state.data.selectedSeatId=event.target.value;persist();renderSeatBoard();renderStats();renderContext()});$('seatColumns').addEventListener('change',renderSeatBoard);$('editSeatRoster').addEventListener('click',()=>openEditor(false,'seat'));$('resetSeatBlocks').addEventListener('click',()=>{const seats=rosterForKind('seat');delete state.data.seatOverrides[seats.id];clearSeatSessions(seats.id);persist();renderSeatBoard();renderStats();renderContext();notify(t('seatReset'))});
   $('bracketBtn').addEventListener('click',generateBracket);$('bracketTargetKind').addEventListener('change',event=>{state.bracketTargetKind=event.target.value;setMode('bracket')});$('resetBracket').addEventListener('click',()=>{delete state.data.bracketSessions[rosterForKind(state.bracketTargetKind).id];persist();renderBracketResult();renderContext();notify(t('bracketReset'))});
+  $('ladderTargetKind').addEventListener('change',event=>{state.ladderTargetKind=event.target.value;setMode('ladder');renderLadder()});$('ladderResourceSelect').addEventListener('change',event=>{state.data.selectedResourceId=event.target.value;persist();renderLadder();renderContext()});$('newLadderResources').addEventListener('click',()=>openEditor(true,'resource'));$('editLadderResources').addEventListener('click',()=>openEditor(false,'resource'));
+  $('ladderNew').addEventListener('click',createLadder);$('ladderAddOne').addEventListener('click',()=>randomLadderRungs(1));$('ladderAddFive').addEventListener('click',()=>randomLadderRungs(5));$('ladderUndo').addEventListener('click',()=>{const session=ladderFor();if(!session||session.locked||!session.rungs.length)return;session.rungs.pop();persist();renderLadder();renderContext()});$('ladderLock').addEventListener('click',lockCurrentLadder);$('ladderRevealAll').addEventListener('click',()=>{const session=ladderFor();if(!session?.locked)return;session.revealed=Array.from({length:session.count},(_,i)=>i);session.focused=null;persist();successSound();renderLadder();renderContext()});$('ladderReset').addEventListener('click',createLadder);
   for(const [id,slot] of [['mixerTopicDeck','topic'],['mixerFormatDeck','format'],['twistDeck','twist'],['bingoDeck','bingo']])$(id).addEventListener('change',event=>{state.data.creativeDecks[slot]=event.target.value;if(slot!=='format')state.data.selectedTaskId=event.target.value;clearResults();persist();render()});
   $('editMixerDeck').addEventListener('click',()=>{state.data.selectedTaskId=creativeDeck('topic').id;openEditor(false,'task')});$('editTwistDeck').addEventListener('click',()=>{state.data.selectedTaskId=creativeDeck('twist').id;openEditor(false,'task')});$('editBingoDeck').addEventListener('click',()=>{state.data.selectedTaskId=creativeDeck('bingo').id;openEditor(false,'task')});
   $('mixerBtn').addEventListener('click',generateMixer);$('resetMixer').addEventListener('click',()=>{state.mixerPairs=[];renderMixerResult();renderContext()});
@@ -642,6 +688,7 @@ function bind(){
   $('copyTurn').addEventListener('click',()=>{const r=rosterForKind(state.turnTargetKind);copy(rotationFor(r).turns.map((person,i)=>`${i+1}. ${label(r.rows[person],r)}`).join('\n'))});
   $('copySeat').addEventListener('click',()=>{const people=rosterForKind('person'),seats=rosterForKind('seat'),session=seatSession(people,seats);copy((session?.assignments||[]).map(pair=>`${label(seats.rows[pair.seat],seats)} → ${label(people.rows[pair.person],people)}`).join('\n'))});
   $('copyBracket').addEventListener('click',()=>{const r=rosterForKind(state.bracketTargetKind);copy(bracketFor(r).map((round,i)=>`${t('rotationRound',{index:i+1})}\n${round.map((match,j)=>`${t('bracketMatch',{index:j+1})}: ${label(r.rows[match.a],r)} / ${match.b===null?t('bracketBye'):label(r.rows[match.b],r)} → ${match.winner===null?'—':label(r.rows[match.winner],r)}`).join('\n')}`).join('\n\n'))});
+  $('copyLadder').addEventListener('click',()=>{const target=rosterForKind(state.ladderTargetKind),resources=rosterForKind('resource');copy(ladderMatchRows().map((item,i)=>`${i+1}. ${label(item.target,target)} → ${label(item.resource,resources)}`).join('\n'))});
   $('exportOrder').addEventListener('click',()=>downloadCsv(`${roster().name}-${t('orderFile')}.csv`,[t('orderColumn'),...roster().columns],state.order.map((row,i)=>[i+1,...row])));
   $('exportGroup').addEventListener('click',()=>downloadCsv(`${roster().name}-${t('groupFile')}.csv`,[t('groupColumn'),...roster().columns],state.groups.flatMap((group,i)=>group.map(row=>[i+1,...row]))));
   $('exportPair').addEventListener('click',()=>{const r=rosterForKind('team');downloadCsv(`${r.name}-${t('pairFile')}.csv`,[t('pairColumn'),...r.columns],state.pairings.flatMap((match,i)=>match.map(row=>[i+1,...row])))});
@@ -655,6 +702,7 @@ function bind(){
   $('exportTurn').addEventListener('click',()=>{const r=rosterForKind(state.turnTargetKind),counts=Array(r.rows.length).fill(0);downloadCsv(`${r.name}-${t('turnFile')}.csv`,[t('orderColumn'),...r.columns,t('turnCountColumn')],rotationFor(r).turns.map((person,i)=>[i+1,...r.rows[person],++counts[person]]))});
   $('exportSeat').addEventListener('click',()=>{const people=rosterForKind('person'),seats=rosterForKind('seat'),session=seatSession(people,seats);downloadCsv(`${people.name}-${t('seatFile')}.csv`,[...seats.columns.map(c=>`${t('seatColumn')} · ${c}`),...people.columns.map(c=>`${t('personColumn')} · ${c}`)],(session?.assignments||[]).map(pair=>[...seats.rows[pair.seat],...people.rows[pair.person]]))});
   $('exportBracket').addEventListener('click',()=>{const r=rosterForKind(state.bracketTargetKind);downloadCsv(`${r.name}-${t('bracketFile')}.csv`,[t('reviewRoundColumn'),t('bracketMatchColumn'),t('bracketSideColumn'),...r.columns,t('bracketWonColumn')],bracketFor(r).flatMap((round,i)=>round.flatMap((match,j)=>[match.a,match.b].filter(x=>x!==null).map((entrant,k)=>[i+1,j+1,k+1,...r.rows[entrant],match.winner===entrant?t('yes'):t('no')]))))});
+  $('exportLadder').addEventListener('click',()=>{const target=rosterForKind(state.ladderTargetKind),resources=rosterForKind('resource');downloadCsv(`${target.name}-${t('ladderFile')}.csv`,[...target.columns.map(column=>`${t('ladderDemandColumn')} · ${column}`),...resources.columns.map(column=>`${t('ladderResourceColumn')} · ${column}`)],ladderMatchRows().map(item=>[...item.target,...item.resource]))});
   $('openTab').addEventListener('click',openTab);$('homeLink').addEventListener('click',()=>showPage('playground'));
   $('rosterStudioLink').addEventListener('click',()=>showPage('studio'));$('ideasLink').addEventListener('click',()=>showPage('ideas'));
   $('studioAdd').addEventListener('click',()=>openEditor(true));$('studioImport').addEventListener('click',()=>{openEditor(true);$('importFile').click()});

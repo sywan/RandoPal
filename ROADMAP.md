@@ -2,9 +2,9 @@
 
 ## 目前已完成 / Available now
 
-網頁版 V0.60 有 14 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome 擴充功能維持 V0.55。
+網頁版 V0.61 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome 擴充功能維持 V0.55。
 
-The V0.60 web app has 14 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome extension remains V0.55.
+The V0.61 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome extension remains V0.55.
 
 | 分類 / Category | 玩法 / Activities |
 | --- | --- |
@@ -13,8 +13,12 @@ The V0.60 web app has 14 activities in six categories. You can preview instructi
 | 團隊交流 / Team exchange | 小組配對 Team Matching、互評巡迴 Review Circuit |
 | 卡片創意 / Card creativity | 創意混搭 Idea Mixer、驚喜事件卡 Twist Cards、話題賓果 Conversation Bingo |
 | 公平輪換 / Fair rotation | 換桌交流 Mixer Rounds、公平輪值 Fair Turn |
-| 場地競賽 / Spaces and contests | 座位冒險 Seat Shuffle、提案擂台 Bracket Builder |
+| 場地競賽 / Spaces and contests | 座位冒險 Seat Shuffle、提案擂台 Bracket Builder、爬格子 Ladder Match |
 
 V0.60 合併完成原先規劃的最後兩批玩法。新玩法仍應依課堂與團建實際回饋調整；後續版本不預先指定版號。
 
 V0.60 combines the final two planned batches. Future activities should follow classroom and team feedback; no further version number is reserved.
+
+V0.61 新增爬格子：需求方與資源各用一份等量名單；手動或隨機加線，秘密洗牌後逐條揭曉。未來玩法仍依使用者回饋決定。
+
+V0.61 adds Ladder Match: equal participant and resource rosters, manual or random rungs, a secret resource shuffle, and path by path reveals. Future activities will follow user feedback.
