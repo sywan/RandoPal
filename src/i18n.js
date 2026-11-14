@@ -63,6 +63,23 @@ export const staticEnglish={
   '咕嘎企鵝夥伴':'Guga the penguin pal','關閉':'Close','繁體中文':'Traditional Chinese','RandoPal 版本 V0.57':'RandoPal version V0.57',
   '例如：\n王小明\n陳小華\n林小美':'For example:\nAlex\nSam\nTaylor'
 };
+Object.assign(staticEnglish,{
+  '選擇玩法':'Choose an activity','依情境找玩法':'Browse by moment','7 種玩法':'7 activities','玩法分類':'Activity categories','分類中的玩法':'Activities in category',
+  '任務盲盒':'Challenge Draw','角色輪盤':'Role Shuffle','互評巡迴':'Review Circuit',
+  '從任務卡庫抽出下一個挑戰。每列是一張卡；可匯入題目、提示、難度等欄位。':'Draw the next challenge from a task deck. Each row is a card; import prompts, hints, difficulty, and more.',
+  '準備開箱':'Ready to open a challenge','按下按鈕，看看這次要挑戰什麼！':'Tap below to reveal your next challenge!','抽一張任務卡':'Draw a challenge',
+  '從角色卡庫抽出角色，分派給不同的人或小組。重新分派時會盡量避開上一輪相同的角色。':'Assign unique roles to people or teams. A new draw tries to avoid repeating the last assignments.',
+  '分派對象':'Assign to','個人':'People','小組':'Teams','角色卡庫':'Role deck','編輯角色卡':'Edit role deck','每張角色卡只會使用一次。':'Each role card is used once per draw.',
+  '點擊下方按鈕分派角色':'Tap below to assign roles','開始角色輪盤':'Assign roles',
+  '安排多輪互評：每組在每輪評一組，不評自己，也不會在可用輪數內重複評同一組。':'Plan review rounds. Each team reviews one other team per round, never itself or the same team twice within the available rounds.',
+  '進行幾輪':'Number of rounds','最多 7 輪不重複':'Up to 7 unique rounds','呈現方式 · 互評':'Presentation · Reviews','▦ 全部輪次':'▦ All Rounds','✦ 逐輪揭曉':'✦ Reveal by Round',
+  '點擊下方按鈕產生互評路線':'Tap below to create a review circuit','尚未產生互評路線':'No review circuit yet','產生後，逐輪揭曉':'Create a circuit, then reveal rounds','每次揭曉一輪':'Reveal one round at a time','產生互評路線':'Create review circuit',
+  '任務卡庫':'Task deck','抽出下一個任務，替活動加入驚喜。':'Draw a new challenge to add surprise to your activity.','開啟任務盲盒 →':'Open Challenge Draw →',
+  '把主持、記錄等角色隨機分派。':'Randomly assign host, note taker, and other roles.','開啟角色輪盤 →':'Open Role Shuffle →',
+  '安排多輪不重複的小組互評路線。':'Plan multiple team review rounds without repeat partners.','開啟互評巡迴 →':'Open Review Circuit →',
+  '只顯示勾選欄位；完整資料會保留於名單，匯出結果時會一併保留。':'Only selected fields are shown. Complete rows are kept in the roster and included in exported results.',
+  'RandoPal 版本 V0.58':'RandoPal version V0.58'
+});
 const staticTranslations={'zh-Hant':{},en:staticEnglish};
 export function uiText(chinese){return staticTranslations[language]?.[chinese]??chinese}
 
@@ -123,6 +140,38 @@ const dynamicChinese={
   orderFile:'隨機排序',groupFile:'隨機分組',orderColumn:'順序',groupColumn:'組別',memberName:'姓名',demoRoster:'示範名單',pairFile:'小組配對',pairColumn:'配對'
 };
 const dynamicTranslations={'zh-Hant':dynamicChinese,en:dynamicEnglish};
+Object.assign(dynamicEnglish,{
+  quickCategory:'Quick moments',planCategory:'Plan the flow',exchangeCategory:'Team exchange',activityCount:'{count} activities',
+  pickActivity:'Random Pick',orderActivity:'Random Order',groupActivity:'Smart Groups',pairActivity:'Team Matching',taskActivity:'Challenge Draw',roleActivity:'Role Shuffle',reviewActivity:'Review Circuit',
+  pickActivityHint:'Pick one person',orderActivityHint:'Set a speaking order',groupActivityHint:'Make new groups',pairActivityHint:'Match existing teams',taskActivityHint:'Reveal a task card',roleActivityHint:'Assign unique roles',reviewActivityHint:'Plan peer review rounds',
+  tasks:'{count} cards',roles:'{count} roles',taskRosterSummary:'{members} cards · {columns} fields · Showing {fields}',roleRosterSummary:'{members} roles · {columns} fields · Showing {fields}',
+  demoTaskRoster:'Sample Challenge Deck',demoRoleRoster:'Sample Role Deck',taskColumn:'Challenge',taskHintColumn:'Hint',roleColumn:'Role',
+  taskTitle:'Open the next challenge',roleTitle:'Everyone gets a role',reviewTitle:'Plan a review circuit',taskPal:'Guga has a surprise challenge!',rolePal:'Guga will assign the roles!',reviewPal:'Guga will plan the reviews!',
+  taskPlan:'Challenge Deck',rolePlan:'Role Plan',reviewPlan:'Review Circuit',taskLeft:'{count} cards left this round',taskDone:'{count} cards drawn this round',roleReady:'{roles} roles for {targets} targets',roleDone:'{count} roles assigned',reviewReady:'{rounds} rounds for {teams} teams',reviewDone:'{rounds} rounds ready',
+  taskHint:'Draw without repeats or allow a card to return to the deck.',roleHint:'{roles} of {targets} targets will receive one role each.',reviewHint:'Up to {count} unique rounds with this roster.',
+  taskEmpty:'All cards have been drawn. Reset this round or turn off exclusion.',taskPickedPal:'Challenge revealed: {name}!',taskReset:'Challenge round reset.',roleAssignedPal:'Roles assigned! Meet the new team.',reviewAssignedPal:'The review circuit is ready!',
+  taskHistoryTitle:'Drawn this round',roleTargetColumn:'Assigned to',roleFile:'role-assignments',taskFile:'challenge-draws',reviewFile:'review-circuit',reviewRoundColumn:'Round',reviewerColumn:'Reviewer',revieweeColumn:'Reviews',
+  reviewRound:'Round {index}',reviewRoundCount:'{count} assignments',reviewRevealProgress:'{done} / {total} rounds revealed',reviewRevealFirst:'Tap to reveal round 1',reviewReadyText:'Circuit ready. Reveal one round at a time.',reviewLink:'{from} → {to}',
+  needReviewTeams:'Add at least two teams to plan reviews.',needRoleTargets:'Add at least one target and one role card.',
+  newTaskRoster:'New Challenge Deck',newRoleRoster:'New Role Deck',taskRowsLabel:'Challenge cards',roleRowsLabel:'Role cards',taskRowsHelp:'One challenge per line; use headers for more fields',roleRowsHelp:'One role per line; use headers for more fields',taskRowsPlaceholder:'For example:\nSketch your idea\nAsk three questions',roleRowsPlaceholder:'For example:\nHost\nNote taker\nTimekeeper',taskEditorCount:'{rows} cards · {columns} fields',roleEditorCount:'{rows} roles · {columns} fields',
+  challengePal:'Open a challenge card!',rolesPal:'Shuffle the roles!',circuitPal:'Plan several review rounds!'
+});
+Object.assign(dynamicChinese,{
+  quickCategory:'快速暖場',planCategory:'安排流程',exchangeCategory:'團隊交流',activityCount:'{count} 種玩法',
+  pickActivity:'隨機抽選',orderActivity:'隨機排序',groupActivity:'智慧分組',pairActivity:'小組配對',taskActivity:'任務盲盒',roleActivity:'角色輪盤',reviewActivity:'互評巡迴',
+  pickActivityHint:'抽出一位幸運兒',orderActivityHint:'排好出場順序',groupActivityHint:'組成新隊伍',pairActivityHint:'配對現有小組',taskActivityHint:'揭曉任務卡',roleActivityHint:'分派不同角色',reviewActivityHint:'安排多輪互評',
+  tasks:'{count} 張卡',roles:'{count} 個角色',taskRosterSummary:'{members} 張卡 · {columns} 欄 · 顯示 {fields}',roleRosterSummary:'{members} 個角色 · {columns} 欄 · 顯示 {fields}',
+  demoTaskRoster:'示範任務卡',demoRoleRoster:'示範角色卡',taskColumn:'任務',taskHintColumn:'提示',roleColumn:'角色',
+  taskTitle:'開出下一個驚喜任務',roleTitle:'讓每個角色找到主人',reviewTitle:'安排互評巡迴路線',taskPal:'咕嘎有一張驚喜任務卡！',rolePal:'咕嘎幫大家分派角色！',reviewPal:'咕嘎幫你安排互評！',
+  taskPlan:'任務卡庫',rolePlan:'角色分派',reviewPlan:'互評巡迴',taskLeft:'本輪剩下 {count} 張卡',taskDone:'本輪已抽 {count} 張卡',roleReady:'{roles} 個角色、{targets} 個對象',roleDone:'已分派 {count} 個角色',reviewReady:'{teams} 組安排 {rounds} 輪',reviewDone:'已安排 {rounds} 輪',
+  taskHint:'可選擇抽過即排除，或讓卡片繼續留在卡庫。',roleHint:'從 {targets} 個對象中選出 {roles} 個，各獲得一個角色。',reviewHint:'這份名單最多可安排 {count} 輪不重複互評。',
+  taskEmpty:'本輪任務卡已抽完；請重設本輪或關閉排除。',taskPickedPal:'開箱成功：{name}！',taskReset:'任務本輪已重設',roleAssignedPal:'角色分派好了，快看看新職責！',reviewAssignedPal:'互評路線排好了！',
+  taskHistoryTitle:'本輪已抽出',roleTargetColumn:'分派給',roleFile:'角色分派',taskFile:'任務抽籤',reviewFile:'互評巡迴',reviewRoundColumn:'輪次',reviewerColumn:'評審組',revieweeColumn:'受評組',
+  reviewRound:'第 {index} 輪',reviewRoundCount:'{count} 個互評安排',reviewRevealProgress:'已揭曉 {done} / {total} 輪',reviewRevealFirst:'點擊揭曉第 1 輪',reviewReadyText:'路線已排好，逐輪揭曉',reviewLink:'{from} → {to}',
+  needReviewTeams:'請至少加入兩個小組才能安排互評',needRoleTargets:'請至少加入一個對象與一張角色卡',
+  newTaskRoster:'新任務卡庫',newRoleRoster:'新角色卡庫',taskRowsLabel:'任務卡',roleRowsLabel:'角色卡',taskRowsHelp:'單欄每行一項；多欄請貼上含標題列的表格',roleRowsHelp:'每行一個角色；多欄請貼上含標題列的表格',taskRowsPlaceholder:'例如：\n畫出你的想法\n提出三個問題',roleRowsPlaceholder:'例如：\n主持人\n記錄員\n計時員',taskEditorCount:'{rows} 張卡 · {columns} 欄',roleEditorCount:'{rows} 個角色 · {columns} 欄',
+  challengePal:'來開一張任務卡吧！',rolesPal:'讓大家換個角色！',circuitPal:'安排多輪的互評！'
+});
 export function translationCatalogComplete(){
   const source=Object.keys(dynamicChinese).sort();
   return LANGUAGES.every(({code})=>{

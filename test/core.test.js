@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -25,6 +25,28 @@ test('team matching keeps whole rows and never leaves one team alone',()=>{
   }
   assert.deepEqual(planTeamMatches(8,'size',3).sizes,[3,3,2]);
   assert.deepEqual(makeTeamMatches([teams[0]],'size',2),[]);
+});
+test('role assignments keep each role unique and rotate on a second draw',()=>{
+  const people=['甲','乙','丙','丁'].map(name=>[name]),roles=['主持','記錄','報告'].map(name=>[name]);
+  const first=assignRoles(people,roles),second=assignRoles(people,roles,first);
+  assert.equal(first.length,3);
+  assert.equal(new Set(first.map(item=>item.target[0])).size,3);
+  assert.equal(new Set(first.map(item=>item.role[0])).size,3);
+  assert.equal(second.filter(item=>first.some(old=>old.target[0]===item.target[0]&&old.role[0]===item.role[0])).length,0);
+});
+test('review circuit assigns each team a different reviewer in each round',()=>{
+  const teams=Array.from({length:5},(_,i)=>[String(i+1),`第 ${i+1} 組`]);
+  const circuit=makeReviewCircuit(teams,9);
+  assert.equal(circuit.length,4);
+  for(const round of circuit){
+    assert.equal(round.length,5);
+    assert.ok(round.every(({reviewer,subject})=>reviewer!==subject));
+    assert.deepEqual(round.map(pair=>pair.reviewer).sort((a,b)=>a[0]-b[0]),teams);
+  }
+  for(const team of teams){
+    const subjects=circuit.flat().filter(pair=>pair.reviewer===team).map(pair=>pair.subject);
+    assert.equal(new Set(subjects).size,4);
+  }
 });
 test('CSV import handles quoted commas and a name header',()=>{
   const rows=parseCsv('姓名,組別\r\n"王,小明",A\r\n陳小華,B\r\n');

@@ -11,6 +11,8 @@ test('older person rosters gain a separate team roster without losing data',asyn
     assert.deepEqual(state.rosters.find(r=>r.id==='class-a').rows,[['001','Alex']]);
     assert.equal(state.selectedId,'class-a');
     assert.equal(state.rosters.find(r=>r.id===state.selectedTeamId).kind,'team');
+    assert.equal(state.rosters.find(r=>r.id===state.selectedTaskId).kind,'task');
+    assert.equal(state.rosters.find(r=>r.id===state.selectedRoleId).kind,'role');
     assert.equal(state.soundEnabled,true);
   }finally{delete globalThis.localStorage}
 });

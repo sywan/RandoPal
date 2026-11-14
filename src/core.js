@@ -34,6 +34,24 @@ export function makeTeamMatches(items,method,number){
   shuffle(items).forEach((item,i)=>matches[i%count].push(item));
   return matches;
 }
+export function assignRoles(targets,roles,previous=[]){
+  if(!targets.length||!roles.length)return [];
+  const selected=shuffle(targets).slice(0,roles.length);
+  const prior=new Map(previous.map(({target,role})=>[JSON.stringify(target),JSON.stringify(role)]));
+  let best=[],fewest=Infinity;
+  for(let attempt=0;attempt<40;attempt++){
+    const candidate=shuffle(roles).slice(0,selected.length).map((role,i)=>({target:selected[i],role}));
+    const repeats=candidate.filter(({target,role})=>prior.get(JSON.stringify(target))===JSON.stringify(role)).length;
+    if(repeats<fewest){best=candidate;fewest=repeats}
+    if(!repeats)break;
+  }
+  return best;
+}
+export function makeReviewCircuit(teams,requestedRounds){
+  if(teams.length<2)return [];
+  const ordered=shuffle(teams),rounds=Math.min(teams.length-1,Math.max(1,Math.floor(Number(requestedRounds)||1)));
+  return Array.from({length:rounds},(_,round)=>ordered.map((reviewer,i)=>({reviewer,subject:ordered[(i+round+1)%ordered.length]})));
+}
 export function parseDelimited(text,delimiter=','){
   const rows=[];let row=[],field='',quoted=false;
   for(let i=0;i<text.length;i++){
