@@ -1,6 +1,6 @@
 import {createServer} from 'node:http';
 import {spawn,spawnSync} from 'node:child_process';
-import {mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
+import {mkdir, mkdtemp, readFile, rm, writeFile} from 'node:fs/promises';
 import {tmpdir} from 'node:os';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
@@ -9,6 +9,7 @@ const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const {version}=JSON.parse(await readFile(path.join(root,'manifest.json'),'utf8'));
 const releaseVersion=`v${version.split('.').slice(0,2).join('.')}`;
 const output=path.join(root,'release',releaseVersion,'chrome/store-assets');
+await mkdir(output,{recursive:true});
 const packageZip=path.join(root,'release',releaseVersion,'chrome',`RandoPal-chrome-${releaseVersion}.zip`);
 const sourceRoot=await mkdtemp(path.join(tmpdir(),'randopal-store-package-'));
 const extracted=spawnSync('unzip',['-q',packageZip,'-d',sourceRoot],{stdio:'inherit'});
@@ -107,11 +108,28 @@ try{
   await pause(4200);
   await shot('01-pick-progress-1280x800.png');
 
-  await click('.mode-tab[data-mode="group"]');
+  await click('#activityCategories button:nth-child(2)');
+  await click('.activity-choice[data-mode="group"]');
   await click('#groupBtn');
   await shot('02-smart-groups-1280x800.png');
 
-  await click('.mode-tab[data-mode="pick"]');
+  await click('.activity-choice[data-mode="ladder"]');
+  await click('#ladderNew');
+  await click('#ladderAddFive');
+  await shot('03-ladder-match-1280x800.png');
+
+  await click('#activityCategories button:nth-child(6)');
+  await click('.activity-choice[data-mode="bracket"]');
+  await click('#bracketBtn');
+  await shot('04-bracket-builder-1280x800.png');
+
+  await click('#activityCategories button:nth-child(4)');
+  await click('.activity-choice[data-mode="bingo"]');
+  await click('#bingoBtn');
+  await shot('05-conversation-bingo-1280x800.png');
+
+  await click('#activityCategories button:nth-child(1)');
+  await click('.activity-choice[data-mode="pick"]');
   await click('.language-option[data-language="en"]');
   await shot('01-pick-progress-en-1280x800.png');
 } finally {

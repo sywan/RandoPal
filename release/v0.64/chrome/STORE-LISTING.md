@@ -1,8 +1,12 @@
 # RandoPal V0.64 · Store listing update
 
-Use these texts for the existing RandoPal item. The extension package includes Traditional Chinese and English `_locales`. The current Store screenshots in `release/v0.55/chrome/store-assets/` show the older V0.55 layout; take fresh 1280 × 800 screenshots from V0.64 if you want the listing to show the new activity browser and progress controls. The existing icon and neutral promotional images may be reused.
+Use these texts for the existing RandoPal item. The extension package includes Traditional Chinese and English `_locales`. Fresh V0.64 screenshots are in [`store-assets/`](store-assets/). They were captured from the packaged V0.64 files with sample rosters; each is a 1280 × 800 RGB PNG. The brand icon and neutral promotional images are carried forward from V0.55.
 
-Suggested Store names: **RandoPal - 隨機抽選與互動活動** (Traditional Chinese) and **RandoPal - Random Activities & Picker** (English). Category: **Tools**. Reuse `release/v0.55/chrome/store-assets/store-icon-128.png` for the separate Store icon field; the updated ZIP also contains the extension toolbar icons.
+Suggested Store names: **RandoPal - 隨機抽選與互動活動** (Traditional Chinese) and **RandoPal - Random Activities & Picker** (English). Category: **Tools**. Use `store-assets/store-icon-128.png` for the separate Store icon field; the updated ZIP also contains the extension toolbar icons.
+
+Suggested screenshots: Chinese `01-pick-progress-1280x800.png`, `02-smart-groups-1280x800.png`, `03-ladder-match-1280x800.png`, `04-bracket-builder-1280x800.png`, `05-conversation-bingo-1280x800.png`; English `01-pick-progress-en-1280x800.png`. The promo assets are `promo-small-440x280.png` and `promo-marquee-1400x560.png`.
+
+Homepage URL: `https://sywan.github.io/RandoPal/`. Support URL: `https://github.com/sywan/RandoPal/issues`. Both public links were checked before use.
 
 ## Short description
 
@@ -48,10 +52,15 @@ Suggested Store names: **RandoPal - 隨機抽選與互動活動** (Traditional C
 >
 > Optionally remember activity progress in this browser so you can continue later, or clear one activity to start fresh. Rosters, results, progress, and preferences stay in the current Chrome browser and do not automatically sync across devices. You control when results are presented, copied, or exported.
 
-## Privacy practices text
+## Saved Store draft fields
 
-- **Single purpose:** Run and present random activities using user-provided rosters and cards stored locally. / 使用本機名單與卡片進行並呈現隨機活動。
-- **`storage` justification:** Save user-created or imported rosters, activity progress and results, selected display fields, and preferences between sessions on this device. / 在本機保存名單、玩法進度與結果、顯示欄位及偏好，供下次繼續使用。
+- **Single purpose:** 將本機名單隨機抽選、排序、分組、配對與分配，並呈現活動結果。 / Randomly pick, order, group, pair, and assign items from local lists, then present the results.
+- **`storage` justification:** 在本機保存使用者建立或匯入的名單、活動進度、顯示欄位與介面偏好，供下次開啟時繼續使用。 / Stores user-created or imported lists, activity progress, display fields, and interface preferences locally for later sessions.
 - **Remote code:** No. JavaScript is packaged in the ZIP, with no externally hosted JS or Wasm.
-- **Data usage:** User-imported rows can include names, student IDs, or other identifiers, so disclose personally identifiable information as applicable. Confirm other categories against real usage before saving.
+- **Data usage:** Personally identifiable information is selected because imported lists can include names or student IDs. The other data categories are unselected. All three limited-use certifications are selected.
 - **Privacy policy URL:** `https://sywan.github.io/RandoPal/privacy-policy.html`.
+- **Category:** Tools. **Visibility:** Public, all regions. **Payment:** Free of charge.
+- **Screenshots in draft:** Five Traditional Chinese localized V0.64 screenshots, one English localized V0.64 screenshot, and one English global V0.64 screenshot. The Store icon and two promo tiles remain the existing brand assets.
+- **Reviewer test instructions:** No login or external setup is required. Click the RandoPal toolbar icon to open the app. Use the sample list, choose an activity from the left menu (for example Lucky Pick or Smart Groups), and run it. You can also paste a list or import CSV/XLSX. Progress and lists are stored locally in Chrome when local saving is enabled.
+
+The draft package is version `0.64.0`; the published version remains `0.55.0` until review and publication. The draft has been saved, but **Submit for review** has not been clicked.

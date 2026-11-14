@@ -14,7 +14,7 @@ The ZIP includes `manifest.json` at its root with version `0.64.0`, both locales
 
 1. Sign in to the [Chrome Web Store Developer Dashboard](https://chrome.google.com/webstore/devconsole/) and open the **existing RandoPal** item.
 2. On **Package**, choose **Upload New Package** and select `RandoPal-chrome-v0.64.zip`. Confirm the pending version is `0.64.0`.
-3. Review **Store listing**. Use the updated descriptions in `STORE-LISTING.md`; keep or refresh the screenshots and promotional assets as appropriate. The old screenshot files in `release/v0.55/chrome/store-assets/` show V0.55 and should not be described as V0.64 captures.
+3. Review **Store listing**. Use the updated descriptions in `STORE-LISTING.md` and the V0.64 screenshots in `store-assets/`. The brand icon and neutral promotional assets are also there.
 4. Review **Privacy practices**. The single purpose remains random activities based on user-provided rosters. Explain `storage` as local saving of rosters, game progress, results, and preferences. Select no remote code: all JavaScript ships in the ZIP. Verify data declarations against the actual user data you allow. Set the privacy policy URL to `https://sywan.github.io/RandoPal/privacy-policy.html` after confirming it opens publicly.
 5. Save the tabs, then choose **Submit for Review**. If you want the approved update to go live automatically, leave automatic publishing enabled. Otherwise select deferred publishing and return to publish after approval.
 6. Once the item says **Published**, verify the Store listing and version. Installed Store copies normally update automatically after Chrome checks for updates and the extension is idle; locally unpacked copies are separate and do not receive Store updates.
