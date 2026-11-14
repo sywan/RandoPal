@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {loadState} from '../src/storage.js';
+import {loadState,stateForStorage} from '../src/storage.js';
 
 test('older person rosters gain a separate team roster without losing data',async()=>{
   const old={rosters:[{id:'class-a',name:'Class A',columns:['Student ID','Name'],rows:[['001','Alex']],displayColumns:[1],picked:[]}],selectedId:'class-a',soundEnabled:true};
@@ -25,4 +25,14 @@ test('older person rosters gain a separate team roster without losing data',asyn
     assert.deepEqual(state.ladderSessions,{});
     assert.equal(state.soundEnabled,true);
   }finally{delete globalThis.localStorage}
+});
+test('turning off progress persistence keeps rosters but omits all game sessions',()=>{
+  const data={rememberProgress:false,lastMode:'bracket',playProgress:{sessions:{sample:{order:[1]}}},rosters:[{id:'class-a',rows:[['Alex']],picked:[0]}],rotationHistory:{a:{turns:[0]}},seatOverrides:{a:{0:false}},seatSessions:{a:{b:{assignments:[]}}},bracketSessions:{a:[[]]},ladderSessions:{a:{locked:true}}};
+  const saved=stateForStorage(data);
+  assert.deepEqual(saved.rosters[0].rows,[['Alex']]);
+  assert.deepEqual(saved.rosters[0].picked,[]);
+  assert.equal(saved.playProgress,null);
+  assert.equal(saved.lastMode,'pick');
+  for(const key of ['rotationHistory','seatOverrides','seatSessions','bracketSessions','ladderSessions'])assert.deepEqual(saved[key],{});
+  assert.deepEqual(data.rosters[0].picked,[0]);
 });

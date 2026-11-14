@@ -10,7 +10,11 @@ export const initialState={rosters:[
   {id:'demo-bingo',kind:'task',name:'話題賓果卡',columns:['話題'],rows:['最近學到的新事物','最想去的地方','一道喜歡的食物','一個擅長的技能','最喜歡的季節','最近看過的作品','想嘗試的運動','童年的遊戲','一件值得感謝的事','喜歡的音樂','最近解決的難題','想學的語言','最有趣的課程','合作成功的經驗','一個小目標','喜歡的動物','最棒的團隊活動','最想發明的東西','一項日常習慣','喜歡的節日','最想交換的技能','最近的驚喜','一個好問題','最常用的工具','今天的心情'].map(value=>[value]),displayColumns:[0],picked:[]},
   {id:'demo-seats',kind:'seat',name:'示範座位圖',columns:['座位','狀態'],rows:Array.from({length:12},(_,i)=>[`${String.fromCharCode(65+Math.floor(i/4))}${i%4+1}`,[3,10].includes(i)?'不可用':'可用']),displayColumns:[0],picked:[]},
   {id:'demo-resources',kind:'resource',name:'示範資源',columns:['資源'],rows:Array.from({length:8},(_,i)=>[`資源 ${String.fromCharCode(65+i)}`]),displayColumns:[0],picked:[]}
-],selectedId:'demo',selectedTeamId:'demo-teams',selectedTaskId:'demo-tasks',selectedNormalTaskId:'demo-tasks',selectedRoleId:'demo-roles',selectedSeatId:'demo-seats',selectedResourceId:'demo-resources',creativeDecks:{topic:'demo-topics',format:'demo-formats',twist:'demo-twists',bingo:'demo-bingo'},rotationHistory:{},seatOverrides:{},seatSessions:{},bracketSessions:{},ladderSessions:{},soundEnabled:false};
+],selectedId:'demo',selectedTeamId:'demo-teams',selectedTaskId:'demo-tasks',selectedNormalTaskId:'demo-tasks',selectedRoleId:'demo-roles',selectedSeatId:'demo-seats',selectedResourceId:'demo-resources',creativeDecks:{topic:'demo-topics',format:'demo-formats',twist:'demo-twists',bingo:'demo-bingo'},rotationHistory:{},seatOverrides:{},seatSessions:{},bracketSessions:{},ladderSessions:{},rememberProgress:true,playProgress:null,lastMode:'pick',soundEnabled:false};
+export function stateForStorage(data){
+  if(data.rememberProgress!==false)return data;
+  return {...data,playProgress:null,lastMode:'pick',rotationHistory:{},seatOverrides:{},seatSessions:{},bracketSessions:{},ladderSessions:{},rosters:data.rosters.map(roster=>({...roster,picked:[]}))};
+}
 const hasChromeStorage=typeof chrome!=='undefined'&&Boolean(chrome.storage?.local);
 export async function loadState(){
   try{
@@ -36,12 +40,16 @@ export async function loadState(){
       if(!data.seatSessions||typeof data.seatSessions!=='object'||Array.isArray(data.seatSessions))data.seatSessions={};
       if(!data.bracketSessions||typeof data.bracketSessions!=='object'||Array.isArray(data.bracketSessions))data.bracketSessions={};
       if(!data.ladderSessions||typeof data.ladderSessions!=='object'||Array.isArray(data.ladderSessions))data.ladderSessions={};
+      if(typeof data.rememberProgress!=='boolean')data.rememberProgress=true;
+      if(!data.playProgress||typeof data.playProgress!=='object'||Array.isArray(data.playProgress))data.playProgress=null;
+      if(typeof data.lastMode!=='string')data.lastMode='pick';
       return data;
     }
   }catch(error){console.warn('Could not load saved data',error)}
   return structuredClone(initialState);
 }
 export async function saveState(data){
-  if(hasChromeStorage)await chrome.storage.local.set({[KEY]:data});
-  else localStorage.setItem(KEY,JSON.stringify(data));
+  const stored=stateForStorage(data);
+  if(hasChromeStorage)await chrome.storage.local.set({[KEY]:stored});
+  else localStorage.setItem(KEY,JSON.stringify(stored));
 }

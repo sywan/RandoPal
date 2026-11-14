@@ -272,7 +272,7 @@ Object.assign(dynamicChinese,{
   bracketReady:'點擊下方按鈕產生對戰表',bracketFirstHint:'先產生完整對戰樹，再逐場點選勝者。',bracketMatch:'第 {index} 場',bracketBye:'輪空',bracketChampion:'冠軍：{name}',bracketChampionWaiting:'冠軍待揭曉',bracketWaiting:'等待勝者',bracketProgress:'已決出 {completed} / {total} 場 · 共 {rounds} 輪',bracketNeed:'請至少加入兩位參賽者。',bracketPal:'咕嘎排好了對戰表！',bracketReset:'對戰表已清除',bracketFile:'單淘汰擂台賽',bracketMatchColumn:'場次',bracketSideColumn:'序位',bracketWonColumn:'晉級'
 });
 Object.assign(staticEnglish,{
-  'RandoPal 版本 V0.63':'RandoPal version V0.63','15 種玩法':'15 activities','資源名單':'Resource rosters',
+  'RandoPal 版本 V0.63':'RandoPal version V0.63','RandoPal 版本 V0.64':'RandoPal version V0.64','15 種玩法':'15 activities','資源名單':'Resource rosters',
   '兩邊名單等量、一對一配對。可手動或隨機加橫線；鎖定格子後，從上往下或從下往上追蹤。':'Match two equal rosters one to one. Add rungs manually or randomly, lock the ladder, then trace from top or bottom.',
   '需求方':'Participants','＋ 新增資源':'＋ Add resources','編輯資源':'Edit resources','選擇等量的需求方與資源，按「建立格子」開始。':'Choose equal numbers of participants and resources, then create the ladder.',
   '建立格子':'Create ladder','＋ 隨機加一條':'＋ Add one random rung','＋ 隨機加五條':'＋ Add five random rungs','↶ 撤銷上一條':'↶ Undo last rung',
@@ -288,6 +288,15 @@ Object.assign(dynamicChinese,{
   ladderActivity:'爬格子',ladderActivityHint:'畫橫線，配出一對一結果',ladderTitle:'沿著格子走，遇見意想不到的結果',ladderHelp:'選兩份等量的需求方與資源名單（各 2–24 筆）。建立格子後，點相鄰直線之間手動畫橫線，或在鎖定前隨時隨機加線。鎖定後資源位置不再變動；可點上方需求方往下追，或點下方資源往上追，每個資源只會分配一次。隨機加線能產生一對一結果，但不保證每一種配對都等機率。可匯入 CSV／Excel 多欄名單，並選擇顯示欄位。',
   demoResources:'示範資源',resourceColumn:'資源',resources:'{count} 項資源',resourceRosterSummary:'{members} 項資源 · {columns} 欄 · 顯示 {fields}',newResourceRoster:'新資源名單',resourceRowsLabel:'資源清單',resourceRowsHelp:'單欄每行一項資源；也可貼上含標題列的表格',resourceRowsPlaceholder:'例如：\n題目 A\n題目 B\n題目 C',resourceEditorCount:'{rows} 項資源 · {columns} 欄',
   ladderRevealedCount:'已揭曉配對',ladderContext:'{count} 位需求方 · {rungs} 條橫線',ladderContextOne:'{count} 位需求方 · 1 條橫線',ladderPal:'咕嘎陪你一起畫橫線！',ladderLockedPal:'格子已鎖定，來選一條路！',ladderMismatch:'兩邊數量必須相同：需求方 {targets} 位、資源 {resources} 項。',ladderNeedTwo:'請至少加入兩位需求方和兩項資源。',ladderTooMany:'每邊支援 2–{max} 筆；目前有 {count} 筆。',ladderStartHint:'選兩份等量名單，再建立格子。',ladderDrawHint:'已畫 {rungs} 條橫線，可繼續加線，再鎖定格子。',ladderDrawHintOne:'已畫 1 條橫線，可繼續加線，再鎖定格子。',ladderLockedHint:'已揭曉 {done} / {total} 條路徑；點上方需求方、下方資源，或一次揭曉。',ladderAllDone:'全部配對已揭曉。可點路徑重新查看、複製結果或匯出 CSV。',ladderEmpty:'先建立格子，再點相鄰直線之間畫橫線。',ladderTraceTitle:'追蹤 {name}',ladderTraceUp:'從下方第 {index} 格往上追蹤',ladderBeforeLock:'請先鎖定格子',ladderRemoveRung:'移除第 {level} 層第 {gap} 與 {next} 條直線之間的橫線',ladderAddRung:'在第 {level} 層第 {gap} 與 {next} 條直線之間加橫線',ladderCollision:'同一高度的相鄰橫線會相碰，請換個位置。',ladderFull:'已沒有可加橫線的位置。',ladderFile:'爬格子',ladderDemandColumn:'需求方',ladderResourceColumn:'資源'
+});
+Object.assign(staticEnglish,{
+  '記住進度':'Remember progress','記住遊戲進度':'Remember game progress','將遊戲進度保存在這台裝置的瀏覽器':'Save game progress in this browser on this device','↺ 清除本玩法':'↺ Clear this game','清除此玩法進度':'Clear progress for this game','收合右側進度':'Collapse progress panel','進度':'Progress'
+});
+Object.assign(dynamicEnglish,{
+  rememberOn:'Remember progress',rememberOff:'Progress not saved',rememberHelp:'Keep game progress in this browser. Rosters stay on this device even when this is off.',progressCleared:'This game is ready for a fresh start.',collapseContext:'Collapse progress panel',expandContext:'Expand progress panel',progressMini:'Progress'
+});
+Object.assign(dynamicChinese,{
+  rememberOn:'記住進度',rememberOff:'不記進度',rememberHelp:'將遊戲進度存在這台裝置的瀏覽器；關閉後，名單仍保留於本機。',progressCleared:'已清除此玩法進度，可以重新開始。',collapseContext:'收合右側進度',expandContext:'展開右側進度',progressMini:'進度'
 });
 export function translationCatalogComplete(){
   const source=Object.keys(dynamicChinese).sort();
