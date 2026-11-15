@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,assignSeats,startBracket,makeBracketRound,completeBracket,advanceBracket,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,makeSeatGrid,assignSeats,startBracket,makeBracketRound,completeBracket,advanceBracket,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -75,6 +75,9 @@ test('mixer rounds keep everyone at one table and avoid prior partners when poss
   assert.equal(new Set(pairs).size,6);
 });
 test('seat shuffle respects availability and accounts for people without seats',()=>{
+  assert.deepEqual(makeSeatGrid(2,3),[['A1'],['A2'],['A3'],['B1'],['B2'],['B3']]);
+  assert.deepEqual(makeSeatGrid(0,3),[]);
+  assert.deepEqual(makeSeatGrid(2,17),[]);
   assert.equal(seatAvailable(['A1','不可用'],['座位','狀態']),false);
   assert.equal(seatAvailable(['A2','可用'],['座位','狀態']),true);
   assert.equal(seatAvailable(['B1','blocked'],['Seat','Status']),false);

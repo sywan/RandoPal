@@ -100,6 +100,11 @@ export function seatAvailable(row,columns){
   const value=String(row[index]??'').trim().toLowerCase();
   return !/^(不可用|停用|封閉|否|無|0|no|false|blocked|unavailable|closed|disabled)$/i.test(value);
 }
+export function makeSeatGrid(rowCount,columnCount){
+  const rows=Number(rowCount),columns=Number(columnCount);
+  if(!Number.isInteger(rows)||!Number.isInteger(columns)||rows<1||rows>16||columns<1||columns>16)return [];
+  return Array.from({length:rows},(_,row)=>Array.from({length:columns},(_,column)=>[`${String.fromCharCode(65+row)}${column+1}`])).flat();
+}
 export function assignSeats(personCount,availableIndices){
   const people=shuffle(Array.from({length:personCount},(_,i)=>i)),seats=shuffle(availableIndices);
   return {assignments:people.slice(0,seats.length).map((person,i)=>({person,seat:seats[i]})),unseated:people.slice(seats.length)};

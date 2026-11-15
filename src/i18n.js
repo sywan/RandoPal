@@ -249,6 +249,8 @@ Object.assign(dynamicChinese,{
 });
 Object.assign(staticEnglish,{
   '14 種玩法':'14 activities','座位冒險':'Seat Shuffle','單淘汰擂台賽':'Bracket Builder','座位圖':'Seat map','每排顯示':'Seats per row','3 個座位':'3 seats','4 個座位':'4 seats','5 個座位':'5 seats','6 個座位':'6 seats','編輯座位圖':'Edit seat map',
+  '先設定橫向列數與縱向行數，快速建立座位圖；點選座位即可停用或恢復，也能選用匯入的座位表。':'Set the number of columns and rows to build a seat map. Tap seats to block or reopen them, or choose an imported map.',
+  '橫向列數':'Columns across','縱向行數':'Rows deep','建立新座位圖':'Create seat map','匯入或編輯座位表':'Import or edit seat map','講台 · 前方':'Stage · Front',
   '把個人名單隨機安排到可用座位；點選座位可暫時停用或恢復，匯入座位表的狀態欄也會生效。':'Randomly assign people to available seats. Tap seats to block or reopen them; an imported status field also applies.',
   '點選座位可切換可用狀態；至少要有一個可用座位。':'Tap a seat to change its availability. At least one seat must be open.','隨機安排座位 →':'Shuffle seats →','重設座位狀態':'Reset seat availability',
   '把個人或小組排進完整的單淘汰賽樹；輪空自動晉級，每場勝者立即出現在下一輪。':'Place people or teams in a complete single elimination bracket. Byes advance automatically, and each winner appears in the next round immediately.',
@@ -257,22 +259,22 @@ Object.assign(staticEnglish,{
 });
 Object.assign(dynamicEnglish,{
   spaceCategory:'Spaces & contests',seatActivity:'Seat Shuffle',bracketActivity:'Bracket Builder',seatActivityHint:'Shuffle available seats',bracketActivityHint:'Build a single elimination bracket',seatTitle:'Find a new place',bracketTitle:'Watch the bracket take shape',
-  seatHelp:'Choose a people roster and seat map. Import seats with an optional Status field, tap seats to block or reopen them, then shuffle. If seats run out, unseated people appear below. Export keeps all fields.',
+  seatHelp:'Set columns across and rows deep to create a seat map, with the stage at the front. Tap seats to block or reopen them, then shuffle. You can still import seats with a Status field. Unseated people appear below; export keeps all fields.',
   bracketHelp:'Choose people or teams to generate the full single elimination bracket at once. Byes advance automatically. Tap a winner to fill the next round immediately; changing an earlier winner clears dependent results. Scroll the bracket to follow the connectors. You can clear or export it.',
   demoSeats:'Sample Seat Map',seatNameColumn:'Seat',seatStatusColumn:'Status',seats:'{count} seats',seatRosterSummary:'{members} seats · {columns} fields · Showing {fields}',seatAvailableCount:'Open seats',seatPlan:'{people} people · {seats} seats',bracketRoundsCount:'Rounds',bracketParticipants:'{count} entrants',newSeatRoster:'New seat map',seatRowsLabel:'Seats',seatRowsHelp:'One seat per line, or paste a table with headers such as Seat and Status',seatRowsPlaceholder:'For example:\nA1\nA2\nA3',seatEditorCount:'{rows} seats · {columns} fields',
-  seatToggle:'{seat}: {status}. Tap to change.',seatOpen:'Available',seatClosed:'Blocked',seatUnseated:'{count} people without seats',seatEveryone:'Everyone has a seat',seatHint:'{open} open seats for {people} people. Tap seats to change availability.',seatNeed:'Add people and at least one available seat.',seatPal:'Guga has shuffled the seats!',seatReset:'Seat availability reset.',seatFile:'seat-shuffle',seatColumn:'Seat',personColumn:'Person',
+  seatToggle:'{seat}: {status}. Tap to change.',seatOpen:'Available',seatClosed:'Blocked',seatUnseated:'{count} people without seats',seatEveryone:'Everyone has a seat',seatHint:'{open} open seats for {people} people. Tap seats to change availability.',seatNeed:'Add people and at least one available seat.',seatPal:'Guga has shuffled the seats!',seatReset:'Seat availability reset.',seatFile:'seat-shuffle',seatColumn:'Seat',personColumn:'Person',seatFront:'Stage · Front',seatGridInvalid:'Enter 1–16 whole-number rows and columns.',generatedSeatMap:'Seat map {rows} × {columns}',seatGridCreated:'Created {count} seats. Tap any seat to block it.',
   bracketReady:'Generate a bracket below',bracketFirstHint:'Generate a bracket, then select the winner of each match.',bracketMatch:'Match {index}',bracketBye:'Bye',bracketChampion:'Champion: {name}',bracketChampionWaiting:'Champion TBD',bracketWaiting:'Awaiting winner',bracketProgress:'{completed} / {total} matches decided · {rounds} rounds planned',bracketNeed:'Add at least two entrants.',bracketPal:'Guga built the bracket!',bracketReset:'Bracket cleared.',bracketFile:'bracket',bracketMatchColumn:'Match',bracketSideColumn:'Side',bracketWonColumn:'Advanced'
 });
 Object.assign(dynamicChinese,{
   spaceCategory:'空間與競賽',seatActivity:'座位冒險',bracketActivity:'單淘汰擂台賽',seatActivityHint:'跳過停用座位，隨機入座',bracketActivityHint:'勝者即時晉級，連線通向冠軍',seatTitle:'換個座位，換個驚喜',bracketTitle:'一路晉級，直到最後的冠軍',
-  seatHelp:'選個人名單和座位圖。可匯入含「狀態」欄的座位表，點座位可停用或恢復，再隨機安排。座位不足時，未入座的人會列在下方；匯出保留完整欄位。',
+  seatHelp:'設定橫向列數與縱向行數，即可快速建立座位圖；講台在最前方。點座位可停用或恢復，再隨機安排。仍可匯入含「狀態」欄的座位表；座位不足者會列在下方。',
   bracketHelp:'選個人或小組，一次畫出完整的單淘汰賽樹與連線。輪空者自動晉級；每場點選勝者後，下一輪立即顯示該隊。若改選前一場，受影響的後續結果會清除。可捲動查看、清除或匯出。',
   demoSeats:'示範座位圖',seatNameColumn:'座位',seatStatusColumn:'狀態',seats:'{count} 個座位',seatRosterSummary:'{members} 個座位 · {columns} 欄 · 顯示 {fields}',seatAvailableCount:'可用座位',seatPlan:'{people} 位成員 · {seats} 個座位',bracketRoundsCount:'輪次',bracketParticipants:'{count} 位參賽者',newSeatRoster:'新座位圖',seatRowsLabel:'座位清單',seatRowsHelp:'單欄每行一個座位；也可貼上含「座位」「狀態」等標題的表格',seatRowsPlaceholder:'例如：\nA1\nA2\nA3',seatEditorCount:'{rows} 個座位 · {columns} 欄',
-  seatToggle:'{seat}：{status}，點擊切換',seatOpen:'可用',seatClosed:'停用',seatUnseated:'{count} 位尚未入座',seatEveryone:'全員都已入座',seatHint:'{open} 個可用座位，{people} 位成員；點選座位可切換狀態。',seatNeed:'請加入成員和至少一個可用座位。',seatPal:'咕嘎安排好了新座位！',seatReset:'座位狀態已重設',seatFile:'座位冒險',seatColumn:'座位',personColumn:'成員',
+  seatToggle:'{seat}：{status}，點擊切換',seatOpen:'可用',seatClosed:'停用',seatUnseated:'{count} 位尚未入座',seatEveryone:'全員都已入座',seatHint:'{open} 個可用座位，{people} 位成員；點選座位可切換狀態。',seatNeed:'請加入成員和至少一個可用座位。',seatPal:'咕嘎安排好了新座位！',seatReset:'座位狀態已重設',seatFile:'座位冒險',seatColumn:'座位',personColumn:'成員',seatFront:'講台 · 前方',seatGridInvalid:'行數與列數請輸入 1–16 的整數。',generatedSeatMap:'座位圖 {rows} × {columns}',seatGridCreated:'已建立 {count} 個座位，點選座位即可停用。',
   bracketReady:'點擊下方按鈕產生對戰表',bracketFirstHint:'先產生完整對戰樹，再逐場點選勝者。',bracketMatch:'第 {index} 場',bracketBye:'輪空',bracketChampion:'冠軍：{name}',bracketChampionWaiting:'冠軍待揭曉',bracketWaiting:'等待勝者',bracketProgress:'已決出 {completed} / {total} 場 · 共 {rounds} 輪',bracketNeed:'請至少加入兩位參賽者。',bracketPal:'咕嘎排好了對戰表！',bracketReset:'對戰表已清除',bracketFile:'單淘汰擂台賽',bracketMatchColumn:'場次',bracketSideColumn:'序位',bracketWonColumn:'晉級'
 });
 Object.assign(staticEnglish,{
-  'RandoPal 版本 V0.63':'RandoPal version V0.63','RandoPal 版本 V0.64':'RandoPal version V0.64','15 種玩法':'15 activities','資源名單':'Resource rosters',
+  'RandoPal 版本 V0.63':'RandoPal version V0.63','RandoPal 版本 V0.64':'RandoPal version V0.64','RandoPal 版本 V0.65':'RandoPal version V0.65','15 種玩法':'15 activities','資源名單':'Resource rosters',
   '兩邊名單等量、一對一配對。可手動或隨機加橫線；鎖定格子後，從上往下或從下往上追蹤。':'Match two equal rosters one to one. Add rungs manually or randomly, lock the ladder, then trace from top or bottom.',
   '需求方':'Participants','＋ 新增資源':'＋ Add resources','編輯資源':'Edit resources','選擇等量的需求方與資源，按「建立格子」開始。':'Choose equal numbers of participants and resources, then create the ladder.',
   '建立格子':'Create ladder','＋ 隨機加一條':'＋ Add one random rung','＋ 隨機加五條':'＋ Add five random rungs','↶ 撤銷上一條':'↶ Undo last rung',

@@ -2,9 +2,9 @@
 
 ## 目前已完成 / Available now
 
-網頁版 V0.64 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome V0.64 套件已備妥，等待商店審核與發布。
+網頁版 V0.65 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome V0.65 套件已備妥；商店版須另行上傳、送審與發布。
 
-The V0.64 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome V0.64 package is ready for Store review and publication.
+The V0.65 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome V0.65 package still requires a separate Store upload, review, and publication.
 
 | 分類 / Category | 玩法 / Activities |
 | --- | --- |
@@ -30,3 +30,7 @@ V0.63 moves Ladder Match to Plan the flow and renames the Spaces and contests ca
 V0.64 增加所有玩法的本機進度記憶、頂端記住進度開關、各玩法清除進度與右側資訊欄收合。名單與遊戲進度分開保存；Chrome 擴充功能 V0.64 套件已建立。
 
 V0.64 adds local activity progress, a remember-progress switch, per-activity reset, and a collapsible right context panel. Rosters remain saved separately. A Chrome V0.64 package is ready.
+
+V0.65 座位冒險新增行列數快速建圖、前方講台標示，以及可點選停用的座位格；原本的座位表匯入繼續支援。新建座位圖和停用狀態會在本機保留。
+
+V0.65 adds a row-and-column seat map builder, a front stage marker, and clickable seat availability. Imported seat maps remain supported, and new maps and blocked seats persist locally.
