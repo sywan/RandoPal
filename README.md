@@ -1,21 +1,21 @@
 # RandoPal
 
-**公開網頁版：V0.65**。Chrome V0.65 套件（manifest 版本 `0.65.0`）已可建立；商店安裝版須另行上傳、送審並發布才能更新。
+**公開網頁版：V0.66**。Chrome V0.66 套件（manifest 版本 `0.66.0`）已可建立；商店安裝版須另行上傳、送審並發布才能更新。
 
 RandoPal 提供六個情境類別、15 種隨機玩法。可匯入 CSV、TXT、XLSX，保留每一列的多欄資料，並選擇結果顯示哪些欄位。介面支援繁體中文和英文，頂部用「繁中 / EN」切換。每種玩法可在選擇前預覽說明，進入後也能點 i 查看操作方式。
 
 ## 兩種使用方式
 
 - [公開網頁版](https://sywan.github.io/RandoPal/)：在電腦或手機的現代瀏覽器開啟。GitHub Pages 使用 `.github/workflows/pages.yml`，從 `main` 分支挑選網頁所需檔案發布。
-- [Chrome 擴充功能 V0.65 套件](release/v0.65/chrome/README.md)：從工具列開啟，也可用投影模式。[下載可上傳的 ZIP](release/v0.65/chrome/RandoPal-chrome-v0.65.zip)。舊 ZIP 保留作備份。
+- [Chrome 擴充功能 V0.66 套件](release/v0.66/chrome/README.md)：從工具列開啟，也可用投影模式。[下載可上傳的 ZIP](release/v0.66/chrome/RandoPal-chrome-v0.66.zip)。舊 ZIP 保留作備份。
 
-兩者各自把名單、進度與偏好保存在使用者目前的瀏覽器，不會自動跨裝置同步。CSV／XLSX 可用於轉移名單。擴充功能 V0.64 隱私政策：[繁中 / English](https://sywan.github.io/RandoPal/privacy-policy.html)。
+兩者各自把名單、進度與偏好保存在使用者目前的瀏覽器，不會自動跨裝置同步。CSV／XLSX 可用於轉移名單。擴充功能隱私政策：[繁中 / English](https://sywan.github.io/RandoPal/privacy-policy.html)。
 
 ## 開發與發布
 
 在專案資料夾執行 `npm start`，本機開啟 `http://localhost:4173/`。執行 `npm test` 檢查核心與翻譯；執行 `npm run build:guide` 更新 [發布指南](deployment-guide.html)。推送 `main` 分支後，GitHub Pages 會重新發布網頁版。`npm run package` 會檢查網頁與 Chrome manifest 的版號一致後建立新 ZIP；舊版套件保留在各自的 `release/` 目錄。
 
-程式入口為 `index.html`；畫面在 `styles.css` 和 `src/app.js`，隨機與匯入邏輯在 `src/core.js`、`src/xlsx.js`，翻譯在 `src/i18n.js`。擴充功能使用 `manifest.json` 與 `_locales/`。詳細的翻譯維護方式見 [I18N.md](I18N.md)。Chrome V0.65 套件可用 `npm run package` 重建；更新既有商店項目的步驟見[發布說明](release/v0.65/chrome/README.md)。
+程式入口為 `index.html`；畫面在 `styles.css` 和 `src/app.js`，隨機與匯入邏輯在 `src/core.js`、`src/xlsx.js`，翻譯在 `src/i18n.js`。擴充功能使用 `manifest.json` 與 `_locales/`。詳細的翻譯維護方式見 [I18N.md](I18N.md)。Chrome V0.66 套件可用 `npm run package` 重建；更新既有商店項目的步驟見[發布說明](release/v0.66/chrome/README.md)。
 
 V0.57 新增「小組配對」：小組名單與個人名單分開保存，支援指定每對幾組或總配對數、配對總覽與逐對揭曉，以及 CSV／Excel 匯入。每列代表一個現有小組；配對時保留整列資料，結果可選擇顯示欄位，CSV 匯出保留所有欄位。當小組數不能整除時，配對數會調整以避免單獨一組。Chrome V0.55 套件維持原樣。
 
@@ -35,4 +35,6 @@ Chrome V0.64 更新文案與隱私欄位說明在 [V0.64 Chrome release](release
 
 V0.64 在同一瀏覽器保存各玩法的未完成進度與結果。頂端「記住進度」可關閉下次進入時的遊戲進度記憶；名單仍保留。各玩法可單獨清除。右側進度欄可收成窄欄，讓中央遊戲區更寬，收合狀態也會在本機保存。Chrome V0.64 套件已可送審。
 
-V0.65 的「座位冒險」可輸入橫向列數與縱向行數，快速建立新座位圖；上方標示講台與前方，點座位即可停用或恢復。既有匯入的座位表仍可選用。新座位圖與座位狀態保存在目前瀏覽器。Chrome V0.65 ZIP 已建立；商店使用者要等新版另行送審、發布後才會取得此功能。
+V0.65 的「座位冒險」可輸入橫向列數與縱向行數，快速建立新座位圖；上方標示講台與前方，點座位即可停用或恢復。既有匯入的座位表仍可選用。新座位圖與座位狀態保存在目前瀏覽器。Chrome V0.65 ZIP 已建立。
+
+V0.66 新增左右、前後、四鄰位、八鄰位與整排／整列交錯留空的考試座位規則。座位表現在可匯出逐筆 CSV、依座位行列排列的格狀 CSV，以及高解析度 PNG 座位圖。座位板改以頁面空間完整呈現，並縮小設定控制列。Chrome V0.66 ZIP 已備妥，商店版仍需另行送審。

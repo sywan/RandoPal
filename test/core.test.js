@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,makeSeatGrid,assignSeats,startBracket,makeBracketRound,completeBracket,advanceBracket,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
+import {shuffle,makeGroups,planTeamMatches,makeTeamMatches,assignRoles,makeReviewCircuit,drawIdeaPair,makeBingoCard,fairTurnIndex,makeMixerRounds,seatAvailable,makeSeatGrid,seatNeighborIndices,chooseSeparatedSeats,assignSeats,seatGridRows,startBracket,makeBracketRound,completeBracket,advanceBracket,parseCsv,parseDelimited,namesFromRows,parseNames,makeRecordSet,serializeTsv,formatRecord} from '../src/core.js';
 
 test('shuffling preserves all entries, including duplicate names',()=>{
   const input=['甲','甲','乙','丙'];
@@ -86,6 +86,26 @@ test('seat shuffle respects availability and accounts for people without seats',
   assert.equal(result.unseated.length,2);
   assert.deepEqual([...result.assignments.map(item=>item.person),...result.unseated].sort((a,b)=>a-b),[0,1,2,3,4]);
   assert.deepEqual(result.assignments.map(item=>item.seat).sort((a,b)=>a-b),[0,2,4]);
+});
+test('seat spacing rules keep neighboring seats empty and report overflow',()=>{
+  const available=Array.from({length:9},(_,i)=>i);
+  for(const [rule,count] of [['none',9],['horizontal',6],['vertical',6],['rowGap',6],['columnGap',6],['four',5],['eight',4]]){
+    const chosen=chooseSeparatedSeats(available,3,9,rule);
+    assert.equal(chosen.length,count,rule);
+    const occupied=new Set(chosen);
+    for(const seat of chosen)for(const neighbor of seatNeighborIndices(seat,3,9,rule))assert.ok(!occupied.has(neighbor),`${rule}: ${seat} touches ${neighbor}`);
+    const assignment=assignSeats(9,chosen);
+    assert.equal(assignment.assignments.length,count);
+    assert.equal(assignment.unseated.length,9-count);
+  }
+  assert.deepEqual(seatNeighborIndices(2,3,9,'horizontal'),[1]);
+  assert.deepEqual(seatNeighborIndices(4,3,9,'rowGap'),[0,1,2,6,7,8]);
+  const blocked=chooseSeparatedSeats([0,1,2,3,5,6,7,8],3,9,'eight');
+  assert.ok(!blocked.includes(4));
+});
+test('seat grid CSV keeps physical rows, blocked seats, spacing gaps, and names',()=>{
+  const grid=seatGridRows([['A1'],['A2'],['B1'],['B2']],2,[{seat:0,person:0}],[['李同學']],i=>i!==3,row=>row[0],row=>row[0],'停用','間距留空','horizontal');
+  assert.deepEqual(grid,[['A1 · 李同學','A2 · 間距留空'],['B1','B2 · 停用']]);
 });
 test('bracket prebuilds every round and advances winners as soon as each match ends',()=>{
   const rounds=startBracket(5);

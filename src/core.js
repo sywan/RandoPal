@@ -105,9 +105,68 @@ export function makeSeatGrid(rowCount,columnCount){
   if(!Number.isInteger(rows)||!Number.isInteger(columns)||rows<1||rows>16||columns<1||columns>16)return [];
   return Array.from({length:rows},(_,row)=>Array.from({length:columns},(_,column)=>[`${String.fromCharCode(65+row)}${column+1}`])).flat();
 }
+const seatOffsets={
+  none:[],horizontal:[[0,-1],[0,1]],vertical:[[-1,0],[1,0]],rowGap:[],columnGap:[],
+  four:[[-1,0],[1,0],[0,-1],[0,1]],
+  eight:[[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]
+};
+export function seatNeighborIndices(index,columns,total,rule){
+  if(!Number.isInteger(columns)||columns<1||!Number.isInteger(index)||index<0||index>=total)return [];
+  const row=Math.floor(index/columns),column=index%columns;
+  if(rule==='rowGap'||rule==='columnGap')return Array.from({length:total},(_,i)=>i).filter(i=>rule==='rowGap'?Math.abs(Math.floor(i/columns)-row)===1:Math.abs(i%columns-column)===1);
+  return (seatOffsets[rule]||[]).flatMap(([dy,dx])=>{
+    const nextColumn=column+dx,nextRow=row+dy,next=nextRow*columns+nextColumn;
+    return nextColumn>=0&&nextColumn<columns&&nextRow>=0&&next<total?[next]:[];
+  });
+}
+export function chooseSeparatedSeats(availableIndices,columns,total,rule){
+  const available=[...new Set(availableIndices)].filter(index=>Number.isInteger(index)&&index>=0&&index<total);
+  if(rule==='none'||!seatOffsets[rule])return available;
+  let best=[];
+  const tryOrder=order=>{
+    const blocked=new Set(),chosen=[];
+    for(const index of order){
+      if(blocked.has(index))continue;
+      chosen.push(index);blocked.add(index);
+      for(const neighbor of seatNeighborIndices(index,columns,total,rule))blocked.add(neighbor);
+    }
+    if(chosen.length>best.length)best=chosen;
+  };
+  const priority=(index,rowParity,columnParity)=>{
+    const row=Math.floor(index/columns),column=index%columns;
+    if(rule==='horizontal')return column%2===columnParity;
+    if(rule==='vertical')return row%2===rowParity;
+    if(rule==='rowGap')return row%2===rowParity;
+    if(rule==='columnGap')return column%2===columnParity;
+    if(rule==='four')return (row+column)%2===rowParity;
+    return row%2===rowParity&&column%2===columnParity;
+  };
+  for(const rowParity of [0,1])for(const columnParity of [0,1]){
+    const preferred=available.filter(index=>priority(index,rowParity,columnParity));
+    const other=available.filter(index=>!priority(index,rowParity,columnParity));
+    tryOrder([...shuffle(preferred),...shuffle(other)]);
+  }
+  for(let attempt=0;attempt<80;attempt++)tryOrder(shuffle(available));
+  return best;
+}
 export function assignSeats(personCount,availableIndices){
   const people=shuffle(Array.from({length:personCount},(_,i)=>i)),seats=shuffle(availableIndices);
   return {assignments:people.slice(0,seats.length).map((person,i)=>({person,seat:seats[i]})),unseated:people.slice(seats.length)};
+}
+export function seatGridRows(seats,columns,assignments,people,seatIsOpen,seatLabel,personLabel,blockedLabel,reservedLabel,rule='none'){
+  const occupied=new Map(assignments.map(({seat,person})=>[seat,person]));
+  const reserved=new Set();
+  for(const index of occupied.keys())for(const neighbor of seatNeighborIndices(index,columns,seats.length,rule))if(!occupied.has(neighbor))reserved.add(neighbor);
+  const rows=[];
+  for(let start=0;start<seats.length;start+=columns){
+    rows.push(seats.slice(start,start+columns).map((seat,offset)=>{
+      const index=start+offset,name=seatLabel(seat);
+      if(!seatIsOpen(index))return `${name} · ${blockedLabel}`;
+      if(occupied.has(index))return `${name} · ${personLabel(people[occupied.get(index)])}`;
+      return reserved.has(index)?`${name} · ${reservedLabel}`:name;
+    }));
+  }
+  return rows;
 }
 export function makeBracketRound(entrants){
   const matches=[];
