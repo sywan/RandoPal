@@ -2,7 +2,7 @@ import {randomInt,shuffle,parseNames,makeGroups,planTeamMatches,makeTeamMatches,
 import {initialState,loadState,saveState} from './storage.js';
 import {namesFromXlsx} from './xlsx.js';
 import {LADDER_MAX_LANES,makeLadderSession,toggleRung,addRandomRung,traceLadder,lockLadder} from './ladder.js';
-import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=17';
+import {setLanguage,getLanguage,t,translateStatic,translateImportError,uiText} from './i18n.js?v=18';
 
 const $=id=>document.getElementById(id);
 const state={data:null,page:'playground',mode:'pick',display:'slot',orderDisplay:'list',groupDisplay:'grid',pairDisplay:'grid',reviewDisplay:'grid',roundsDisplay:'grid',roleTargetKind:'person',turnTargetKind:'person',bracketTargetKind:'team',ladderTargetKind:'person',orderRevealIndex:0,groupRevealIndex:0,pairRevealIndex:0,reviewRevealIndex:0,roundsRevealIndex:0,groupMethod:'count',pairMethod:'size',order:[],groups:[],pairings:[],taskDraws:[],rolesAssigned:[],previousRoles:[],reviewRounds:[],roundsResult:[],turnWinnerIndex:null,mixerPairs:[],twistIndices:[],bingoRows:[],bingoMarks:new Set(),running:false,editingNew:false,editorSelection:new Set([0]),editorColumnsSignature:'',editorSingleColumnName:'姓名',importTable:null,lastWinner:null};

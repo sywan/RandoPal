@@ -2,9 +2,9 @@
 
 ## 目前已完成 / Available now
 
-網頁版 V0.66 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome V0.66 套件已備妥；商店版須另行上傳、送審與發布。
+網頁版 V0.67 有 15 種玩法，依使用情境分為六類。可在選擇前預覽玩法說明，進入後也可點 i 再看。Chrome V0.67 套件已備妥；商店版須另行上傳、送審與發布。
 
-The V0.66 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome V0.66 package still requires a separate Store upload, review, and publication.
+The V0.67 web app has 15 activities in six categories. You can preview instructions before selecting a game or open them again from its panel. The Chrome V0.67 package still requires a separate Store upload, review, and publication.
 
 | 分類 / Category | 玩法 / Activities |
 | --- | --- |
@@ -35,6 +35,10 @@ V0.65 座位冒險新增行列數快速建圖、前方講台標示，以及可�
 
 V0.65 adds a row-and-column seat map builder, a front stage marker, and clickable seat availability. Imported seat maps remain supported, and new maps and blocked seats persist locally.
 
-V0.66 座位冒險新增相鄰、四鄰、八鄰，以及整排／整列交錯留空的安排規則；可匯出逐筆 CSV、格狀 CSV 與 PNG 座位圖。
+V0.66 座位冒險新增相鄰、四鄰、八鄰，以及整列／整行交錯留空的安排規則；可匯出逐筆 CSV、格狀 CSV 與 PNG 座位圖。
 
 V0.66 Seat Shuffle adds adjacent, four-neighbor, eight-neighbor, alternating-row, and alternating-column spacing rules. Export a flat CSV, a grid CSV, or a PNG seat map.
+
+V0.67 統一座位圖的列／行方向：列為橫向 row，行為直向 column；建圖、間距選單與座位圖名稱採同一套用語。
+
+V0.67 standardizes seat map terms: row is horizontal (列), column is vertical (行), across setup controls, spacing options, and generated map names.

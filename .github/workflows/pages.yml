@@ -25,10 +25,10 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Stage only public web files
         run: |
-          mkdir -p site/icons site/release/v0.66/chrome
+          mkdir -p site/icons site/release/v0.67/chrome
           cp index.html styles.css deployment-guide.html site/
-          cp release/v0.66/chrome/privacy-policy.html site/privacy-policy.html
-          cp release/v0.66/chrome/RandoPal-chrome-v0.66.zip site/release/v0.66/chrome/
+          cp release/v0.67/chrome/privacy-policy.html site/privacy-policy.html
+          cp release/v0.67/chrome/RandoPal-chrome-v0.67.zip site/release/v0.67/chrome/
           cp -R src site/
           cp icons/pal.svg icons/guga-pal-hd.png site/icons/
           cp icons/guga-pal-web-v056.gif icons/guga-pal-web-v056.webp site/icons/

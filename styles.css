@@ -342,7 +342,7 @@ footer{margin:18px 0 6px}
 /* Seat controls stay compact so the projected map gets the available height. */
 #seatPanel .seat-toolbar{display:flex;align-items:end;flex-wrap:wrap;gap:8px 12px;margin:8px 0 4px}
 #seatPanel .seat-setup,#seatPanel .dual-source{display:flex;align-items:end;flex:0 1 auto;gap:8px;margin:0}
-#seatPanel .seat-setup label{width:76px;flex:none}
+#seatPanel .seat-setup label{width:112px;flex:none}
 #seatPanel .seat-setup input{min-height:36px;padding:5px 8px}
 #seatPanel .dual-source label{width:185px;flex:none}
 #seatPanel .dual-source select,#seatPanel .seat-rule select{width:100%;min-height:36px;padding:5px 8px;border:1px solid #d8e9f7;border-radius:8px;background:#fff;color:#3c6c96;font-size:13px}
